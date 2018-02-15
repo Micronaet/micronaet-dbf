@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <record id="group_dbf_manager" model="res.groups">
+            <field name="name">DBF / Mananger</field>
+        </record>
+        <record id="group_dbf_user" model="res.groups">
+            <field name="name">DBF / User</field>
+        </record>
+   </data>
+</openerp>        

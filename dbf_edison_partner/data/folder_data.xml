@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <record id="data_config_root_folder" model="ir.config_parameter">
+            <field name="key">edison.root.path</field>
+            <field name="value">~/mount/edison</field>
+        </record>
+   </data>
+</openerp>
