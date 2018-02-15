@@ -46,10 +46,11 @@ class ResPartner(orm.Model):
     
     _inherit = 'res.partner'
     
-    def schedule_sql_partner_import(self, cr, uid, verbose_log_count=100, 
+    def schedule_dbf_edison_partner_import(self, cr, uid, verbose_log_count=100, 
             context=None):
         ''' Import partner from external DBF
         '''
+        # Get parameter:
         company_pool = self.pool.get('res.company')
         company_ids = company_pool.search(cr, uid, [], context=context)
         company_proxy = company_pool.browse(
@@ -71,29 +72,59 @@ class ResPartner(orm.Model):
             )
             
         i = 0
-        db.field_names
+        #db.field_names
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.warning('Import partner #: %s' % i)
             
-            # Mapping fields:    
+            # Mapping fields:
             ref = record['CCODCLIE']
-            name = record['CDESCLIE']
-            
+            name = '%s%s' % (
+                record['CDESCLIE'] or '',
+                record['CDE2CLIE'] or '',
+                )
+            data = {
+                'dbf_import': True,
+                'dbf_customer_code': ref, 
+                'ref': ref,
+                'name': name,
+                'street': record['CINDIR'],
+                #'': record['CDPROV']
+                '
+                # TODO add all field
+                #'CCOMUNE', 'CCAP', 'CCODFISC', 
+                #'CPARTIVA', 'CFASCIA', 'CCODCOPA', 'CCODBANC', 'CCODCIVA', 
+                # Destination (empty):
+                #'CDESDESCR', 'CDESINDIR', 'CDESCITTA', 
+                #'CTEACLIE', 'CTEUCLIE', 
+                #'CTECCLIE', 'CTELRIF', 'CMESIMAN', 'NCOSTMAN', 'DDATAMAN', 
+                #'CTIPCLIE', 'CCODZONA', 'CTLIARSE', 'CTLIARCO', 'CNAZIONE', 
+                #'LFLAGCEE', 'CCODAGEN', 'NSCONTEX', 'CCODVETT', 'CCODVALU', 
+                #'CCODLIST', 'CCONTORI', 'CSTATO', 'CCONTCORR', 'CEMAIL', 
+                #'CSITOWEB', 'NSPESEIN', 'NSPEBOLL', 'NSPETRAS', 'CNUMDIC', 
+                #'DDATDIC', 'CNUMREG', 'DDATREG', 'LEFFRATE', 'CFILLER', 
+                #'NQUALIFI', 'DDATINSE', 'CRIFERIM', 'CCORTATT', 'LSPESEIN', 
+                #'LSPEBOLL', 'LNOEXPCO', 'NSPEFISS', 'CCODCINN', 'CCODCINE', 
+                #'NSCOFATT', 'NSCOARFA', 'NSTSINCR', 'DDATOPER', 'CORAOPER', 
+                #'CCODOPER', 'CCODUTEN', 'NRICMANO', 'NRICSPEX', 'LPERSONA', 
+                #'CFILLER1', 'CTEC2CLI', 'CTELRIF2', 'CCODAMMI', 'CCODPORT', 
+                #'CTIPSOGG', 'NQUALIF2', 'NQUALIF3', 'LCALCRIT', 'LFRZPRZV', 
+                #'LFRZNPRZ', 'CEMAIL2', 'CPEC', 'MZONA', 'MNOTE'
+                }
+                
             # Search partner code:
             
             # Write or create:
 
-            #u'CDE2CLIE', u'CINDIR', u'CCOMUNE', u'CCAP', u'CPROV', u'CCODFISC', u'CPARTIVA', u'CFASCIA', u'CCODCOPA', u'CCODBANC', u'CCODCIVA', u'CDESDESCR', u'CDESINDIR', u'CDESCITTA', u'CTEACLIE', u'CTEUCLIE', u'CTECCLIE', u'CTELRIF', u'CMESIMAN', u'NCOSTMAN', u'DDATAMAN', u'CTIPCLIE', u'CCODZONA', u'CTLIARSE', u'CTLIARCO', u'CNAZIONE', u'LFLAGCEE', u'CCODAGEN', u'NSCONTEX', u'CCODVETT', u'CCODVALU', u'CCODLIST', u'CCONTORI', u'CSTATO', u'CCONTCORR', u'CEMAIL', u'CSITOWEB', u'NSPESEIN', u'NSPEBOLL', u'NSPETRAS', u'CNUMDIC', u'DDATDIC', u'CNUMREG', u'DDATREG', u'LEFFRATE', u'CFILLER', u'NQUALIFI', u'DDATINSE', u'CRIFERIM', u'CCORTATT', u'LSPESEIN', u'LSPEBOLL', u'LNOEXPCO', u'NSPEFISS', u'CCODCINN', u'CCODCINE', u'NSCOFATT', u'NSCOARFA', u'NSTSINCR', u'DDATOPER', u'CORAOPER', u'CCODOPER', u'CCODUTEN', u'NRICMANO', u'NRICSPEX', u'LPERSONA', u'CFILLER1', u'CTEC2CLI', u'CTELRIF2', u'CCODAMMI', u'CCODPORT', u'CTIPSOGG', u'NQUALIF2', u'NQUALIF3', u'LCALCRIT', u'LFRZPRZV', u'LFRZNPRZ', u'CEMAIL2', u'CPEC', u'MZONA', u'MNOTE']
 
         
         return True
     
     _columns = {
         'dbf_import': fields.boolean('DBF import'),
-        'dbf_supplier_code': fields.char('DBF supplier code', size=10),
         'dbf_customer_code': fields.char('DBF customer code', size=10),
+        'dbf_supplier_code': fields.char('DBF supplier code', size=10),
         'dbf_destination_code': fields.char('DBF destination code', size=10),
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

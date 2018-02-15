@@ -45,7 +45,7 @@ class res_company(orm.Model):
 
     _columns = {
         'dbf_root_path': fields.char(
-            'DBF Root path', size=180, required=True),
+            'DBF Root path', size=180),
         'dbf_ignorecase': fields.boolean(
             'DBF ignore case table name', 
             help='Capital name for files'),

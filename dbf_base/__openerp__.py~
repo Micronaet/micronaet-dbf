@@ -33,7 +33,7 @@
     'init_xml': [],
     'demo': [],
     'data': [
-        'DBF_group'',
+        'security/dbf_group',
         'parameter_view.xml',
         ],
     'active': False,

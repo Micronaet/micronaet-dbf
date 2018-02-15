@@ -61,6 +61,5 @@ class res_company(orm.Model):
         
     _defaults = {
         'dbf_encoding': lambda *x: 'LATIN',
-        'dbf_ignorecase': lambda *a: True,
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

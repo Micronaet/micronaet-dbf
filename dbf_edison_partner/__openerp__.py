@@ -29,13 +29,14 @@
     'license': 'AGPL-3',
     'depends': [
         'base',
+        'dbf_base',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
         'data/folder_data.xml',
         'partner_view.xml',
-        #'scheduler.xml',
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,
