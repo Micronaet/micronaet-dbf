@@ -81,7 +81,7 @@ class ResPartner(orm.Model):
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
-                _logger.warning('Import partner #: %s' % i)
+                _logger.warning('Import customer #: %s' % i)
             
             # Mapping fields:
             ref = record['CCODCLIE']
@@ -90,6 +90,9 @@ class ResPartner(orm.Model):
                 record['CDE2CLIE'] or '',
                 )
             vat = record['CPARTIVA']
+            if vat and vat[:1].isdigit():
+                vat = 'IT%s' % vat
+                
             data = {
                 'customer': True,
                 'dbf_import': True,
@@ -97,11 +100,15 @@ class ResPartner(orm.Model):
                 'ref': ref,
                 'name': name,
                 'street': record['CINDIR'],
-                #'cdprov': record['CDPROV']
                 'city': record['CCOMUNE'],
                 'zip': record['CCAP'],
                 'fiscalcode': record['CCODFISC'],
                 'vat': vat,
+                'phone': record['CTEACLIE'],
+                'mobile': record['CTECCLIE'],
+                'email': record['CEMAIL'], 
+                'website': record['CSITOWEB'],
+                #'prov': record['CDPROV']
                 #'codefascia': record['CFASCIA'],
                 #'codecopa': record['CCODCOPA'],
                 #'codebanca': record['CCODBANC'],
@@ -109,9 +116,7 @@ class ResPartner(orm.Model):
                 #'desdescr': record['CDESDESCR'],
                 #'desindir': record['CDESINDIR'],
                 #'descitta':  record['CDESCITTA'], 
-                'phone': record['CTEACLIE'],
                 #'phone2': record['CTEUCLIE'], 
-                'mobile': record['CTECCLIE'],
                 #'telrif': record['CTELRIF'],
                 #'mesiman': record['CMESIMAN'],
                 #'costoman': record['NCOSTMAN'],
@@ -130,8 +135,6 @@ class ResPartner(orm.Model):
                 #'contori': record['CCONTORI'],
                 #'cstato': record['CSTATO'], 
                 #'contocorr': record['CCONTCORR'],
-                'email': record['CEMAIL'], 
-                'website': record['CSITOWEB'],
                 #'nspesein': record['NSPESEIN'],
                 #'nspeseboll': record['NSPEBOLL'],
                 #'nspesetras': record['NSPETRAS'],
@@ -194,6 +197,8 @@ class ResPartner(orm.Model):
                     ]
                     
             partner_ids = self.search(cr, uid, domain, context=context)
+            # TODO manage error (also for vat)
+            # len(partner_ids) > 1 TODO WARNING
             if partner_ids:
                 self.write(cr, uid, partner_ids, data, context=context)
             else:
@@ -215,7 +220,7 @@ class ResPartner(orm.Model):
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
-                _logger.warning('Import partner #: %s' % i)
+                _logger.warning('Import supplier #: %s' % i)
             
             # Mapping fields:
             ref = record['CCODFORN']
@@ -224,11 +229,13 @@ class ResPartner(orm.Model):
                 record['CDE2FORN'] or '',
                 )
             vat = record['CPARTIVA']
+            if vat and vat[:1].isdigit():
+                vat = 'IT%s' % vat
             data = {
                 'supplier': True,
                 'dbf_import': True,
                 'dbf_supplier_code': ref, 
-                'ref': ref,
+                #'ref': ref,
                 'name': name,
                 'street': record['CINDIR'],
                 'city': record['CCOMUNE'],
@@ -310,11 +317,11 @@ class ResPartner(orm.Model):
                     ]
                     
             partner_ids = self.search(cr, uid, domain, context=context)
+            # len(partner_ids) > 1 TODO WARNING
             if partner_ids:
                 self.write(cr, uid, partner_ids, data, context=context)
             else:
-                self.create(cr, uid, data, context=context)
-                
+                self.create(cr, uid, data, context=context)                
         return True        
             
     _columns = {

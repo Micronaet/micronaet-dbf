@@ -18,11 +18,11 @@
 ###############################################################################
 
 {
-    'name': 'DBF: Edison partner',
+    'name': 'DBF: Edison analytic',
     'version': '0.1',
     'category': 'ETL',
     'description': '''        
-        Import EDISON Software partner
+        Import EDISON Software account analytic
         ''',
     'author': 'Micronaet S.r.l. - Nicola Riolini',
     'website': 'http://www.micronaet.it',
@@ -30,11 +30,12 @@
     'depends': [
         'base',
         'dbf_base',
+        'analytic',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        'partner_view.xml',
+        'analytic_view.xml',
         'scheduler.xml',
         ],
     'active': False,
