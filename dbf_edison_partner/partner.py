@@ -46,24 +46,29 @@ class ResPartner(orm.Model):
     
     _inherit = 'res.partner'
     
-    def schedule_dbf_edison_partner_import(self, cr, uid, verbose_log_count=100, 
-            context=None):
+    def schedule_dbf_edison_partner_import(self, cr, uid, 
+            verbose_log_count=100, context=None):
         ''' Import partner from external DBF
         '''
-        # Get parameter:
+        # ---------------------------------------------------------------------
+        #                      COMMON PART: Get parameter
+        # ---------------------------------------------------------------------
+        # Browse company: 
         company_pool = self.pool.get('res.company')
         company_ids = company_pool.search(cr, uid, [], context=context)
         company_proxy = company_pool.browse(
             cr, uid, company_ids, context=context)[0]
         
         # Read parameter:    
-        dbf_root_path = company_proxy.dbf_root_path
+        dbf_root_path = os.path.expanduser(company_proxy.dbf_root_path)
         dbf_ignorecase = company_proxy.dbf_ignorecase
         dbf_memofile = company_proxy.dbf_memofile
         dbf_encoding = company_proxy.dbf_encoding
-        
-        filename = os.path.join(dbf_root_path, 'TBCLIE.DBF')
 
+        # ---------------------------------------------------------------------
+        #                             CUSTOMER
+        # ---------------------------------------------------------------------
+        filename = os.path.join(dbf_root_path, 'TBCLIE.DBF')
         db = DBF(
             filename, 
             ignorecase=dbf_ignorecase,
@@ -72,7 +77,7 @@ class ResPartner(orm.Model):
             )
             
         i = 0
-        #db.field_names
+        #XXX db.field_names
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
@@ -84,45 +89,234 @@ class ResPartner(orm.Model):
                 record['CDESCLIE'] or '',
                 record['CDE2CLIE'] or '',
                 )
+            vat = record['CPARTIVA']
             data = {
+                'customer': True,
                 'dbf_import': True,
                 'dbf_customer_code': ref, 
                 'ref': ref,
                 'name': name,
                 'street': record['CINDIR'],
-                #'': record['CDPROV']
+                #'cdprov': record['CDPROV']
                 'city': record['CCOMUNE'],
                 'zip': record['CCAP'],
-                
-                # TODO add all field
-                #'CCODFISC', 
-                #'CPARTIVA', 'CFASCIA', 'CCODCOPA', 'CCODBANC', 'CCODCIVA', 
-                # Destination (empty):
-                #'CDESDESCR', 'CDESINDIR', 'CDESCITTA', 
-                #'CTEACLIE', 'CTEUCLIE', 
-                #'CTECCLIE', 'CTELRIF', 'CMESIMAN', 'NCOSTMAN', 'DDATAMAN', 
-                #'CTIPCLIE', 'CCODZONA', 'CTLIARSE', 'CTLIARCO', 'CNAZIONE', 
-                #'LFLAGCEE', 'CCODAGEN', 'NSCONTEX', 'CCODVETT', 'CCODVALU', 
-                #'CCODLIST', 'CCONTORI', 'CSTATO', 'CCONTCORR', 'CEMAIL', 
-                #'CSITOWEB', 'NSPESEIN', 'NSPEBOLL', 'NSPETRAS', 'CNUMDIC', 
-                #'DDATDIC', 'CNUMREG', 'DDATREG', 'LEFFRATE', 'CFILLER', 
-                #'NQUALIFI', 'DDATINSE', 'CRIFERIM', 'CCORTATT', 'LSPESEIN', 
-                #'LSPEBOLL', 'LNOEXPCO', 'NSPEFISS', 'CCODCINN', 'CCODCINE', 
-                #'NSCOFATT', 'NSCOARFA', 'NSTSINCR', 'DDATOPER', 'CORAOPER', 
-                #'CCODOPER', 'CCODUTEN', 'NRICMANO', 'NRICSPEX', 'LPERSONA', 
-                #'CFILLER1', 'CTEC2CLI', 'CTELRIF2', 'CCODAMMI', 'CCODPORT', 
-                #'CTIPSOGG', 'NQUALIF2', 'NQUALIF3', 'LCALCRIT', 'LFRZPRZV', 
-                #'LFRZNPRZ', 'CEMAIL2', 'CPEC', 'MZONA', 'MNOTE'
+                'fiscalcode': record['CCODFISC'],
+                'vat': vat,
+                #'codefascia': record['CFASCIA'],
+                #'codecopa': record['CCODCOPA'],
+                #'codebanca': record['CCODBANC'],
+                #'codeiva': record['CCODCIVA'],               
+                #'desdescr': record['CDESDESCR'],
+                #'desindir': record['CDESINDIR'],
+                #'descitta':  record['CDESCITTA'], 
+                'phone': record['CTEACLIE'],
+                #'phone2': record['CTEUCLIE'], 
+                'mobile': record['CTECCLIE'],
+                #'telrif': record['CTELRIF'],
+                #'mesiman': record['CMESIMAN'],
+                #'costoman': record['NCOSTMAN'],
+                #'dataman': record['DDATAMAN'], 
+                #'ctipcli': record['CTIPCLIE'],
+                #'codzona': record['CCODZONA'],
+                #'ctliarse': record['CTLIARSE'],
+                #'ctliarco': record['CTLIARCO'],
+                #'nazione': record['CNAZIONE'],  
+                #'lflagcee': record['LFLAGCEE'], 
+                #'codagen': record['CCODAGEN'],
+                #'scintex': record['NSCONTEX'],
+                #'codvett': record['CCODVETT'],
+                #'codvalu': record['CCODVALU'], 
+                #'codlist': record['CCODLIST'],
+                #'contori': record['CCONTORI'],
+                #'cstato': record['CSTATO'], 
+                #'contocorr': record['CCONTCORR'],
+                'email': record['CEMAIL'], 
+                'website': record['CSITOWEB'],
+                #'nspesein': record['NSPESEIN'],
+                #'nspeseboll': record['NSPEBOLL'],
+                #'nspesetras': record['NSPETRAS'],
+                #'numdic': record['CNUMDIC'], 
+                #'datdic': record['DDATDIC'],
+                #'numreg': record['CNUMREG'],
+                #'datareg': record['DDATREG'],
+                #'leffrate': record['LEFFRATE'],
+                #'cfiller': record['CFILLER'], 
+                #'nqualif': record['NQUALIFI'],
+                #'datanse': record['DDATINSE'],
+                #'criferm': record['CRIFERIM'],
+                #'contratt': record['CCORTATT'],
+                #'lspesein': record['LSPESEIN'], 
+                #'lspeseboll': record['LSPEBOLL'],
+                #'lnoexpco': record['LNOEXPCO'],
+                #'nspefiss': record['NSPEFISS'],
+                #'codcinn': record['CCODCINN'],
+                #'codcine': record['CCODCINE'], 
+                #'nscofatt': record['NSCOFATT'],
+                #'nscoarfa': record['NSCOARFA'],
+                #'nstsincr': record['NSTSINCR'],
+                #'ddatoper': record['DDATOPER'],
+                #'coraoper': record['CORAOPER'], 
+                #'ccodoper': record['CCODOPER'],
+                #'ccoduten': record['CCODUTEN'],
+                #'nricmano': record['NRICMANO'],
+                #'nricspex': record['NRICSPEX'],
+                #'lpersona': record['LPERSONA'], 
+                #'cfiller1': record['CFILLER1'],
+                #'ctec2cli': record['CTEC2CLI'],
+                #'ctelrif2': record['CTELRIF2'],
+                #'codammi': record['CCODAMMI'],
+                #'codport': record['CCODPORT'], 
+                #'tipsogg': record['CTIPSOGG'],
+                #'nqualif2': record['NQUALIF2'],
+                #'nqualif3': record['NQUALIF3'],
+                #'lcalcrit': record['LCALCRIT'],
+                #'lfrzprzv': record['LFRZPRZV'], 
+                #'lfrznprz': record['LFRZNPRZ'],
+                #'cemail2': record['CEMAIL2'],
+                #'cpec': record['CPEC'],
+                #'mzona': record['MZONA'],
+                #'mnote': record['MNOTE'],
                 }
                 
             # Search partner code:
+            if vat: 
+                domain = [
+                    '|', '|', 
+                    ('dbf_customer_code', '=', ref),
+                    ('name', '=', name),
+                    ('vat', '=', vat),
+                    ]
+            else: 
+                domain = [
+                    '|', 
+                    ('dbf_customer_code', '=', ref),
+                    ('name', '=', name),
+                    ]
+                    
+            partner_ids = self.search(cr, uid, domain, context=context)
+            if partner_ids:
+                self.write(cr, uid, partner_ids, data, context=context)
+            else:
+                self.create(cr, uid, data, context=context)
+
+        # ---------------------------------------------------------------------
+        #                             SUPPLIER
+        # ---------------------------------------------------------------------
+        filename = os.path.join(dbf_root_path, 'TBFORN.DBF')
+        db = DBF(
+            filename, 
+            ignorecase=dbf_ignorecase,
+            ignore_missing_memofile=dbf_memofile,
+            encoding=dbf_encoding,
+            )
             
-            # Write or create:
+        i = 0
+        #XXX db.field_names
+        for record in db:
+            i += 1
+            if verbose_log_count and i % verbose_log_count == 0:
+                _logger.warning('Import partner #: %s' % i)
+            
+            # Mapping fields:
+            ref = record['CCODFORN']
+            name = '%s%s' % (
+                record['CDESFORN'] or '',
+                record['CDE2FORN'] or '',
+                )
+            vat = record['CPARTIVA']
+            data = {
+                'supplier': True,
+                'dbf_import': True,
+                'dbf_supplier_code': ref, 
+                'ref': ref,
+                'name': name,
+                'street': record['CINDIR'],
+                'city': record['CCOMUNE'],
+                'zip': record['CCAP'],
+                'fiscalcode': record['CCODFISC'],
+                'vat': vat,
+                'phone': record['CTEAFORN'],
+                'mobile': record['CTECFORN'],
+                'email': record['CEMAIL'], 
+                'website': record['CSITOWEB'],
+                }
+                #'cprov': record['CPROV'], 
+                #'ccodaggi': record[CCODAGGI],
+                #'ddatulag': record[DDATULAG],
+                #'cfilelis': record[CFILELIS],
+                #'cesclcar': record[CESCLCAR],	
+                #'cteuforn': record[CTEUFORN], 
+                #'ctelrif': record[CTELRIF],	
+                #'ccodprag': record[CCODPRAG],
+                #'lflagages': record[LFLAGAGES],
+                #'nflagages': record[NFLAGAGES],
+                #'ccodbanc': record[CCODBANC],
+                #'ccodciva': record[CCODCIVA]	
+                #'ccodcopa': record[CCODCOPA],	
+                #'nscontex': record[NSCONTEX],	
+                #'ccontori': record[CCONTORI],
+                #'cstato': record[CSTATO],
+                #'ccontcorr': record[CCONTCORR],
+                #'nqualifi': record[NQUALIFI],
+                #'ccodcate': record[CCODCATE],	
+                #'ddatinse': record[DDATINSE],
+                #'criferim': record[CRIFERIM],
+                #'ccortatt': record[CCORTATT],
+                #'cversaggln': record[CVERSAGGLN],	
+                #'cfilepro': record[CFILEPRO],
+                #'cfilebar': record[CFILEBAR],
+                #'cfilefas': record[CFILEFAS],
+                #'cfilecav': record[CFILECAV],	
+                #'ccodagen': record[CCODAGEN],
+                #'lnoexpco': record[LNOEXPCO],
+                #'cnazione': record[CNAZIONE],
+                #'ccodcinn': record[CCODCINN],
+                #'ccodcine': record[CCODCINE],
+                #'nstsincr': record[NSTSINCR],
+                #'ddatoper': record[DDATOPER],
+                #'coraoper': record[CORAOPER],
+                #'ccodoper': record[CCODOPER],
+                #'ccoduten': record[CCODUTEN],
+                #'lpersona': record[LPERSONA]	
+                #'nqualif2': record[NQUALIF2],
+                #'nqualif3': record[NQUALIF3],
+               	#'cspediz': record[CSPEDIZ],	
+                #'ccodport': record[CCODPORT],
+                #'ccodzona': record[CCODZONA],
+                #'cemail2': record[CEMAIL2],
+                #'cpec': record[CPEC],	
+                #'mzona': record[MZONA],
+               	#'mnote': record[MNOTE],
+               	#'mnoteord': record[MNOTEORD],
+               	#'mprodser': record[MPRODSER],
+               	#'mvalanno': record[MVALANNO],	
+                #'mstrateg': record[MSTRATEG],
+               	#'mesitrif': record[MESITRIF],
+               	#'mrivalut': record[MRIVALUT],
 
-
-        
-        return True
-    
+            # Search partner code:
+            if vat: 
+                domain = [
+                    '|', '|', 
+                    ('dbf_supplier_code', '=', ref),
+                    ('name', '=', name),
+                    ('vat', '=', vat),
+                    ]
+            else: 
+                domain = [
+                    '|', 
+                    ('dbf_supplier_code', '=', ref),
+                    ('name', '=', name),
+                    ]
+                    
+            partner_ids = self.search(cr, uid, domain, context=context)
+            if partner_ids:
+                self.write(cr, uid, partner_ids, data, context=context)
+            else:
+                self.create(cr, uid, data, context=context)
+                
+        return True        
+            
     _columns = {
         'dbf_import': fields.boolean('DBF import'),
         'dbf_customer_code': fields.char('DBF customer code', size=10),

@@ -50,8 +50,8 @@ class res_company(orm.Model):
             'DBF ignore case table name', 
             help='Capital name for files'),
         'dbf_memofile': fields.boolean(
-            'DBF has memofile',
-            help='Extra memo file for DBF is present'),            
+            'DBF ignore memofile',
+            help='Extra memo file for DBF is not present'),            
         'dbf_encoding': fields.selection([
             ('LATIN', 'Latin'),
             ('ASCII', 'ASCII'),
