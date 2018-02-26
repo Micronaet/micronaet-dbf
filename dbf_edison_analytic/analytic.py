@@ -50,11 +50,11 @@ class AccountAnalyticAccount(orm.Model):
             verbose_log_count=100, context=None):
         ''' Import analytic from external DBF
         '''
-        # ---------------------------------------------------------------------
-        #                      COMMON PART: Get parameter
-        # ---------------------------------------------------------------------
-        # Browse company: 
+        # Pool used:
+        parner_pool = self.pool.get('res.partner')
         company_pool = self.pool.get('res.company')
+
+        # Browse company: 
         company_ids = company_pool.search(cr, uid, [], context=context)
         company_proxy = company_pool.browse(
             cr, uid, company_ids, context=context)[0]
@@ -66,7 +66,7 @@ class AccountAnalyticAccount(orm.Model):
         dbf_encoding = company_proxy.dbf_encoding
 
         # ---------------------------------------------------------------------
-        #                             CUSTOMER
+        #                         ANALYTIC ACCOUNT:
         # ---------------------------------------------------------------------
         filename = os.path.join(dbf_root_path, 'CANTIE.DBF')
         db = DBF(
@@ -84,13 +84,99 @@ class AccountAnalyticAccount(orm.Model):
             
             # Mapping fields:
             # TODO change:
-            code = record['']
-            name = record['CDESCLIE'] or '',
+            code = '%s%s' % (
+                '', # record['CANNCANT'] or '', # TODO remove year
+                record['CNUMCANT'] or '',
+                ),
+            name = record['CDESCLIE'] or ''
+            partner_code = record['CCODCLIE']
+            partner_id = False
+            
+            #= record['CDESCANT'],
+            #= record['CCODCLIE'],
+            #= record['CDESDECL'],
+            #= record['DDATINLA'],
+            #= record['DDATFILA'],
+            #= record['CINDCANT'],
+            #= record['CCOMCANT'],
+            #= record['LBLOCCA'],
+            #= record['CRIF1CAN'],
+            #= record['CRIF2CAN'],
+            #= record['CRESESTE'],
+            #= record['LECONOMIA'],
+            #= record['LCONTRATTO'],
+            #= record['NOREVIAGGI'],
+            #= record['NMINVIAGGI'],
+            #= record['CFILLER'],
+            #= record['LSELRIGA'],
+            #= record['NRIFIMAT'],
+            #= record['NRIFIMAN'],
+            #= record['NRIFISPE'],
+            #= record['NRIFIMATV'],
+            #= record['NRIFIMANV'],
+            #= record['NRIFISPEV'],
+            #= record['CTIPCOMM'],
+            #= record['CTLIARTI'],
+            #= record['CFASCIA'],
+            #= record['CTLICOST'],
+            #= record['CTLIPREZ'],
+            #= record['NRICPREZ'],
+            #= record['LRICNOTE'],
+            #= record['LVALCOPR'],
+            #= record['NRMACOST'],
+            #= record['NRMAPREZ'],
+            #= record['LMANCOPR'],
+            #= record['NRSECOST'],
+            #= record['NRSEPREZ'],
+            #= record['LSEXCOPR'],
+            #= record['NKMPVIAGGI'],
+            #= record['NCOSVIAGGI'],
+            #= record['NPRZVIAGGI'],
+            #= record['LATTESA'],
+            #= record['LRICNOST'],
+            #= record['NRICMANO'],
+            #= record['NRICSPEX'],
+            #= record['DDATAANA'],
+            #= record['CCODPERS'],
+            #= record['CLISCECO'],
+            #= record['CSTATO'],
+            #= record['NRMTCOST'],
+            #= record['NSTSINCR'],
+            #= record['DATOPER'],
+            #= record['CORAOPER'],
+            #= record['CCODOPER'],
+            #= record['CCODUTEN'],
+            #= record['CCODRECO'],
+            #= record['LVALPRZV'],
+            #= record['NRICPRZV'],
+            #= record['CCODPRAT'],
+            #= record['CCONTORI'],
+            #= record['DDATCONS'],
+            #= record['CCODLUPR'],
+            #= record['NIMPCONT'],
+            #= record['NPERESEG'],
+            #= record['LVALCOMP'],
+            #= record['LVALTUOR'],
+            #= record['CFILLER2'],
+            #= record['NPERCOST'],
+            #= record['NPERPROV'],	
+            #= record['CCODAGEN'],
+            #= record['NPERRITG'],
+            #= record['NPERMUTA'],
+            #= record['CCODARTI'],
+            #= record['NQTAARTI'],
+            #= record['NPERPRO2'],
+            #= record['CCODAMMI'],
+            #= record['MMEMO1'],
+            #= record['MMEMOANA'],
+            #= record['MMEMOANA2'],
+            #= record['MMEMOANA3'],
 
-            data = {
+            data = {,
                 'dbf_import': True,
                 'code': code,
                 'name': name,
+                'partner_id': partner_id,
                 }
                 
             # Search partner code:
@@ -98,7 +184,9 @@ class AccountAnalyticAccount(orm.Model):
                 ('code', '=', code),
                 ], context=context)
 
-            # len(analytic_ids) > 1 TODO WARNING
+            if len(analytic_ids) > 1:
+                _logger.error('More account with code: %s' % code)
+
             if analytic_ids:
                 self.write(cr, uid, analytic_ids, data, context=context)
             else:

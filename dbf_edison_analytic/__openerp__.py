@@ -30,7 +30,8 @@
     'depends': [
         'base',
         'dbf_base',
-        'analytic',
+        'dbf_edison_partner',
+        'analytic',        
         ],
     'init_xml': [],
     'demo': [],
