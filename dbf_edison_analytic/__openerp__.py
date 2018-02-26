@@ -32,6 +32,7 @@
         'dbf_base',
         'dbf_edison_partner',
         'analytic',        
+        #'intervention_analytic_address', # Partner address imported also
         ],
     'init_xml': [],
     'demo': [],
