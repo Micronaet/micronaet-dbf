@@ -50,8 +50,10 @@ class AccountAnalyticAccount(orm.Model):
             verbose_log_count=100, context=None):
         ''' Import analytic from external DBF
         '''
+        _logger.info('Start import account')    
+
         # Pool used:
-        parner_pool = self.pool.get('res.partner')
+        partner_pool = self.pool.get('res.partner')
         company_pool = self.pool.get('res.company')
 
         # Browse company: 
@@ -82,34 +84,72 @@ class AccountAnalyticAccount(orm.Model):
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.warning('Import analytic #: %s' % i)
             
-            # Mapping fields:
-            # TODO change:
+            # -----------------------------------------------------------------
+            # Mapping fields (readability):
+            # -----------------------------------------------------------------
+            # Analytic account ref:
             code = '%s%s' % (
                 '', # record['CANNCANT'] or '', # TODO remove year
                 record['CNUMCANT'] or '',
-                ),
-            name = record['CDESCLIE'] or ''
-            partner_code = record['CCODCLIE']
-            partner_id = False
+                )                                
+            name = record['CDESCANT'] or ''
             
-            #= record['CDESCANT'],
-            #= record['CCODCLIE'],
-            #= record['CDESDECL'],
-            #= record['DDATINLA'],
-            #= record['DDATFILA'],
-            #= record['CINDCANT'],
-            #= record['CCOMCANT'],
-            #= record['LBLOCCA'],
-            #= record['CRIF1CAN'],
-            #= record['CRIF2CAN'],
-            #= record['CRESESTE'],
-            #= record['LECONOMIA'],
-            #= record['LCONTRATTO'],
-            #= record['NOREVIAGGI'],
-            #= record['NMINVIAGGI'],
-            #= record['CFILLER'],
-            #= record['LSELRIGA'],
-            #= record['NRIFIMAT'],
+            # Partner ref.:
+            partner_code = record['CCODCLIE'] or ''
+                
+            # Address ref.:    
+            address_street = record['CINDCANT']
+            address_city = record['CCOMCANT']
+            address_code = '#%s' % code
+
+            # -----------------------------------------------------------------
+            # Linked partner:
+            # -----------------------------------------------------------------
+            partner_ids = partner_pool.search(cr, uid, [
+                ('dbf_customer_code', '=', partner_code)
+                ], context=context)
+
+            partner_id = False
+            if len(partner_ids) > 1:
+                _logger.error('More then one partner code: %s' % partner_code)
+            if partner_ids:
+                partner_id = partner_ids[0]
+
+            # -----------------------------------------------------------------
+            # Address partner (create):
+            # -----------------------------------------------------------------
+            address_id = False
+            if address_street or address_city:
+                address_ids = partner_pool.search(cr, uid, [
+                    ('dbf_destination_code', '=', address_code)
+                    ], context=context)
+                    
+                if len(address_ids) > 1:
+                    _logger.error(
+                        'More then one address code: %s' % address_code)
+                address_data = {
+                    'name': name,
+                    'parent_id': partner_id,
+                    'street': address_street,
+                    'city': address_city,                    
+                    }        
+
+                if address_ids:
+                    address_id = address_ids[0]
+                    partner_pool.write(cr, uid, address_id, address_data, 
+                        context=context)
+                else:       
+                    address_id = partner_pool.create(
+                        cr, uid, address_data, context=context)
+
+            #= record['CDESCANT'], = record['CCODCLIE'],
+            #= record['CDESDECL'], = record['DDATINLA'],
+            #= record['DDATFILA'], = record['LBLOCCA'],
+            #= record['CRIF1CAN'], = record['CRIF2CAN'],
+            #= record['CRESESTE'], = record['LECONOMIA'],
+            #= record['LCONTRATTO'], = record['NOREVIAGGI'],
+            #= record['NMINVIAGGI'], = record['CFILLER'],
+            #= record['LSELRIGA'],  record['NRIFIMAT'],
             #= record['NRIFIMAN'],
             #= record['NRIFISPE'],
             #= record['NRIFIMATV'],
@@ -172,11 +212,14 @@ class AccountAnalyticAccount(orm.Model):
             #= record['MMEMOANA2'],
             #= record['MMEMOANA3'],
 
-            data = {,
+            data = {
                 'dbf_import': True,
                 'code': code,
                 'name': name,
                 'partner_id': partner_id,
+                'address_id': address_id,
+                'type': 'normal', 
+                'use_timesheets': True,
                 }
                 
             # Search partner code:
@@ -191,6 +234,7 @@ class AccountAnalyticAccount(orm.Model):
                 self.write(cr, uid, analytic_ids, data, context=context)
             else:
                 self.create(cr, uid, data, context=context)
+        _logger.info('End import account')    
         return True        
             
     _columns = {
