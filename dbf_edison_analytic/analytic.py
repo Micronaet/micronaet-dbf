@@ -131,7 +131,9 @@ class AccountAnalyticAccount(orm.Model):
                     'name': name,
                     'parent_id': partner_id,
                     'street': address_street,
-                    'city': address_city,                    
+                    'city': address_city,
+                    'is_address': True,
+                    #'is_company': True,                    
                     }        
 
                 if address_ids:
