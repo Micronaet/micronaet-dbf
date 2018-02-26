@@ -81,7 +81,7 @@ class ResPartner(orm.Model):
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
-                _logger.warning('Import customer #: %s' % i)
+                _logger.info('Import customer #: %s' % i)
             
             # Mapping fields:
             ref = record['CCODCLIE']
@@ -197,12 +197,33 @@ class ResPartner(orm.Model):
                     ]
                     
             partner_ids = self.search(cr, uid, domain, context=context)
-            # TODO manage error (also for vat)
-            # len(partner_ids) > 1 TODO WARNING
+            if len(partner_ids) > 1:
+                _logger.error('Error more partner: %s (use first)' % name)
+                partner_ids = [partner_ids[0]]
+                
             if partner_ids:
-                self.write(cr, uid, partner_ids, data, context=context)
+                try:
+                    self.write(cr, uid, partner_ids, data, context=context)
+                except:
+                    # Try to remove vat
+                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    del(data['vat'])
+                    try:
+                        self.write(cr, uid, partner_ids, data, context=context)
+                    except:
+                        _logger.error('Error data: %s' % data)
+                                                
             else:
-                self.create(cr, uid, data, context=context)
+                try:
+                    self.create(cr, uid, data, context=context)                
+                except:
+                    # Try to remove vat
+                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    del(data['vat'])
+                    try:
+                        self.create(cr, uid, data, context=context)                
+                    except:
+                        _logger.error('Error data: %s' % data)
 
         # ---------------------------------------------------------------------
         #                             SUPPLIER
@@ -220,7 +241,7 @@ class ResPartner(orm.Model):
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
-                _logger.warning('Import supplier #: %s' % i)
+                _logger.info('Import supplier #: %s' % i)
             
             # Mapping fields:
             ref = record['CCODFORN']
@@ -317,11 +338,34 @@ class ResPartner(orm.Model):
                     ]
                     
             partner_ids = self.search(cr, uid, domain, context=context)
-            # len(partner_ids) > 1 TODO WARNING
+            
+            if len(partner_ids) > 1:
+                _logger.error('Error more partner: %s (use first)' % name)
+                partner_ids = [partner_ids[0]]
+                
             if partner_ids:
-                self.write(cr, uid, partner_ids, data, context=context)
+                try:
+                    self.write(cr, uid, partner_ids, data, context=context)
+                except:
+                    # Try to remove vat
+                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    del(data['vat'])
+                    try:
+                        self.write(cr, uid, partner_ids, data, context=context)
+                    except:
+                        _logger.error('Error data: %s' % data)
+                                                
             else:
-                self.create(cr, uid, data, context=context)                
+                try:
+                    self.create(cr, uid, data, context=context)                
+                except:
+                    # Try to remove vat
+                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    del(data['vat'])
+                    try:
+                        self.create(cr, uid, data, context=context)                
+                    except:
+                        _logger.error('Error data: %s' % data)
         return True        
             
     _columns = {
