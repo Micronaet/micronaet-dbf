@@ -94,6 +94,7 @@ class ResPartner(orm.Model):
                 vat = 'IT%s' % vat
                 
             data = {
+                'is_company': True,
                 'customer': True,
                 'dbf_import': True,
                 'dbf_customer_code': ref, 
@@ -253,6 +254,7 @@ class ResPartner(orm.Model):
             if vat and vat[:1].isdigit():
                 vat = 'IT%s' % vat
             data = {
+                'is_company': True,
                 'supplier': True,
                 'dbf_import': True,
                 'dbf_supplier_code': ref, 
