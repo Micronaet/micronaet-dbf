@@ -28,6 +28,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from openerp import SUPERUSER_ID, api
 from openerp import tools
+from dbfread import DBF
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
 from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 

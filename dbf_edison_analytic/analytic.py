@@ -72,8 +72,9 @@ class AccountAnalyticAccount(orm.Model):
             code = '%s%s' % (
                 '', # record['CANNCANT'] or '', # TODO remove year
                 record['CNUMCANT'] or '',
-                )                                
-            name = record['CDESCANT'] or ''
+                )
+            name = record['CDESCANT'] or ''            
+            from_date = record['DDATINLA'].strftime(DEFAULT_SERVER_DATE_FORMAT)
             
             # Partner ref.:
             partner_code = record['CCODCLIE'] or ''
@@ -100,7 +101,7 @@ class AccountAnalyticAccount(orm.Model):
             # Address partner (create):
             # -----------------------------------------------------------------
             address_id = False
-            if address_street or address_city:
+            if address_street:# or address_city:
                 address_ids = partner_pool.search(cr, uid, [
                     ('dbf_destination_code', '=', address_code)
                     ], context=context)
@@ -125,45 +126,19 @@ class AccountAnalyticAccount(orm.Model):
                     address_id = partner_pool.create(
                         cr, uid, address_data, context=context)
 
-            #= record['CDESCANT'], = record['CCODCLIE'],
-            #= record['CDESDECL'], = record['DDATINLA'],
-            #= record['DDATFILA'], = record['LBLOCCA'],
-            #= record['CRIF1CAN'], = record['CRIF2CAN'],
-            #= record['CRESESTE'], = record['LECONOMIA'],
-            #= record['LCONTRATTO'], = record['NOREVIAGGI'],
-            #= record['NMINVIAGGI'], = record['CFILLER'],
-            #= record['LSELRIGA'],  record['NRIFIMAT'],
-            #= record['NRIFIMAN'], = record['NRIFISPE'],
-            #= record['NRIFIMATV'], = record['NRIFIMANV'],
-            #= record['NRIFISPEV'], = record['CTIPCOMM'],
-            #= record['CTLIARTI'], = record['CFASCIA'],
-            #= record['CTLICOST'], = record['CTLIPREZ'],
-            #= record['NRICPREZ'], = record['LRICNOTE'],
-            #= record['LVALCOPR'], = record['NRMACOST'],
-            #= record['NRMAPREZ'], = record['LMANCOPR'],
-            #= record['NRSECOST'], = record['NRSEPREZ'],
-            #= record['LSEXCOPR'], = record['NKMPVIAGGI'],
-            #= record['NCOSVIAGGI'], = record['NPRZVIAGGI'],
-            #= record['LATTESA'], = record['LRICNOST'],
-            #= record['NRICMANO'], = record['NRICSPEX'],
-            #= record['DDATAANA'], = record['CCODPERS'],
-            #= record['CLISCECO'], = record['CSTATO'],
-            #= record['NRMTCOST'], = record['NSTSINCR'],
-            #= record['DATOPER'], = record['CORAOPER'],
-            #= record['CCODOPER'], = record['CCODUTEN'],
-            #= record['CCODRECO'], = record['LVALPRZV'],
-            #= record['NRICPRZV'], = record['CCODPRAT'],
-            #= record['CCONTORI'], = record['DDATCONS'],
-            #= record['CCODLUPR'], = record['NIMPCONT'],
-            #= record['NPERESEG'], = record['LVALCOMP'],
-            #= record['LVALTUOR'], = record['CFILLER2'],
-            #= record['NPERCOST'], = record['NPERPROV'],	
-            #= record['CCODAGEN'], = record['NPERRITG'],
-            #= record['NPERMUTA'], = record['CCODARTI'],
-            #= record['NQTAARTI'], = record['NPERPRO2'],
-            #= record['CCODAMMI'], = record['MMEMO1'],
-            #= record['MMEMOANA'], = record['MMEMOANA2'],
-            #= record['MMEMOANA3'],
+            #CDESCANT CCODCLIE CDESDECL DDATINLA DDATFILA LBLOCCA
+            #CRIF1CAN CRIF2CAN CRESESTE LECONOMIA LCONTRATTO NOREVIAGGI
+            #NMINVIAGGI CFILLER LSELRIGA NRIFIMAT NRIFIMAN NRIFISPE
+            #NRIFIMATV NRIFIMANV NRIFISPEV CTIPCOMM CTLIARTI CFASCIA
+            #CTLICOST CTLIPREZ NRICPREZ LRICNOTE LVALCOPR NRMACOST
+            #NRMAPREZ LMANCOPR NRSECOST NRSEPREZ LSEXCOPR NKMPVIAGGI
+            #NCOSVIAGGI NPRZVIAGGI LATTESA LRICNOST NRICMANO NRICSPEX
+            #DDATAANA CCODPERS CLISCECO CSTATO NRMTCOST NSTSINCR
+            #DATOPER CORAOPER CCODOPER CCODUTEN CCODRECO LVALPRZV
+            #NRICPRZV CCODPRAT CCONTORI DDATCONS CCODLUPR NIMPCONT
+            #NPERESEG LVALCOMP LVALTUOR CFILLER2 NPERCOST NPERPROV	
+            #CCODAGEN NPERRITG NPERMUTA CCODARTI NQTAARTI NPERPRO2
+            #CCODAMMI MMEMO1 MMEMOANA MMEMOANA2 MMEMOANA3
 
             data = {
                 'dbf_import': True,
@@ -173,6 +148,7 @@ class AccountAnalyticAccount(orm.Model):
                 'address_id': address_id,
                 'type': 'normal', 
                 'use_timesheets': True,
+                'from_date': from_date,
                 }
                 
             # Search partner code:
@@ -192,5 +168,10 @@ class AccountAnalyticAccount(orm.Model):
             
     _columns = {
         'dbf_import': fields.boolean('DBF import'),
+        'from_date': fields.date('From Date'),
         }
+   
+    _defaults = {
+        'from_date': lambda *x: datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT),
+        }     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

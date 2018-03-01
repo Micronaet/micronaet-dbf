@@ -1,7 +1,44 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record model="ir.ui.view" id="view_account_analytic_date_form">
+            <field name="name">account.analytic.account.create.date.form</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+            <field name="arch" type="xml">
+                <field name="code" position="after">
+                    <field name="from_date" />
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_account_analytic_date_tree">
+            <field name="name">account.analytic.account.create.date.tree</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="arch" type="xml">
+                <field name="code" position="after">
+                    <field name="from_date" />
+                </field>
+            </field>
+        </record>
+        
+        <record model="ir.ui.view" id="view_account_analytic_date_search">
+            <field name="name">account.analytic.account.create.date.search</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_search"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="from_date" />
+                    <field name="from_date" string="From date" filter_domain="[('from_date','&gt;=',self)]"/>
+                    <field name="from_date" string="To date" filter_domain="[('from_date','&lt;=',self)]"/>
+                    <!--<filter name="from_date_from" string="From date" domain="[('state','=','draft')]"/>                    
+                    <filter name="from_date_to" string="To date" domain="[('from_date','=','draft')]"/>-->
+                </field>                
 
+                <!--<filter name="group_partner" position="before">
+                    <filter name="group_date" string="Date" context="{'group_by': 'from_date'}" />
+                </filter>-->
+            </field>
+        </record>
     </data>
 </openerp>
-
