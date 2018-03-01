@@ -56,27 +56,8 @@ class AccountAnalyticAccount(orm.Model):
         partner_pool = self.pool.get('res.partner')
         company_pool = self.pool.get('res.company')
 
-        # Browse company: 
-        company_ids = company_pool.search(cr, uid, [], context=context)
-        company_proxy = company_pool.browse(
-            cr, uid, company_ids, context=context)[0]
-        
-        # Read parameter:    
-        dbf_root_path = os.path.expanduser(company_proxy.dbf_root_path)
-        dbf_ignorecase = company_proxy.dbf_ignorecase
-        dbf_memofile = company_proxy.dbf_memofile
-        dbf_encoding = company_proxy.dbf_encoding
-
-        # ---------------------------------------------------------------------
-        #                         ANALYTIC ACCOUNT:
-        # ---------------------------------------------------------------------
-        filename = os.path.join(dbf_root_path, 'CANTIE.DBF')
-        db = DBF(
-            filename, 
-            ignorecase=dbf_ignorecase,
-            ignore_missing_memofile=dbf_memofile,
-            encoding=dbf_encoding,
-            )
+        db = company_pool.get_dbf_table(
+            cr, uid, 'CANTIE.DBF', context=context)
             
         i = 0
         for record in db:
@@ -152,66 +133,36 @@ class AccountAnalyticAccount(orm.Model):
             #= record['LCONTRATTO'], = record['NOREVIAGGI'],
             #= record['NMINVIAGGI'], = record['CFILLER'],
             #= record['LSELRIGA'],  record['NRIFIMAT'],
-            #= record['NRIFIMAN'],
-            #= record['NRIFISPE'],
-            #= record['NRIFIMATV'],
-            #= record['NRIFIMANV'],
-            #= record['NRIFISPEV'],
-            #= record['CTIPCOMM'],
-            #= record['CTLIARTI'],
-            #= record['CFASCIA'],
-            #= record['CTLICOST'],
-            #= record['CTLIPREZ'],
-            #= record['NRICPREZ'],
-            #= record['LRICNOTE'],
-            #= record['LVALCOPR'],
-            #= record['NRMACOST'],
-            #= record['NRMAPREZ'],
-            #= record['LMANCOPR'],
-            #= record['NRSECOST'],
-            #= record['NRSEPREZ'],
-            #= record['LSEXCOPR'],
-            #= record['NKMPVIAGGI'],
-            #= record['NCOSVIAGGI'],
-            #= record['NPRZVIAGGI'],
-            #= record['LATTESA'],
-            #= record['LRICNOST'],
-            #= record['NRICMANO'],
-            #= record['NRICSPEX'],
-            #= record['DDATAANA'],
-            #= record['CCODPERS'],
-            #= record['CLISCECO'],
-            #= record['CSTATO'],
-            #= record['NRMTCOST'],
-            #= record['NSTSINCR'],
-            #= record['DATOPER'],
-            #= record['CORAOPER'],
-            #= record['CCODOPER'],
-            #= record['CCODUTEN'],
-            #= record['CCODRECO'],
-            #= record['LVALPRZV'],
-            #= record['NRICPRZV'],
-            #= record['CCODPRAT'],
-            #= record['CCONTORI'],
-            #= record['DDATCONS'],
-            #= record['CCODLUPR'],
-            #= record['NIMPCONT'],
-            #= record['NPERESEG'],
-            #= record['LVALCOMP'],
-            #= record['LVALTUOR'],
-            #= record['CFILLER2'],
-            #= record['NPERCOST'],
-            #= record['NPERPROV'],	
-            #= record['CCODAGEN'],
-            #= record['NPERRITG'],
-            #= record['NPERMUTA'],
-            #= record['CCODARTI'],
-            #= record['NQTAARTI'],
-            #= record['NPERPRO2'],
-            #= record['CCODAMMI'],
-            #= record['MMEMO1'],
-            #= record['MMEMOANA'],
-            #= record['MMEMOANA2'],
+            #= record['NRIFIMAN'], = record['NRIFISPE'],
+            #= record['NRIFIMATV'], = record['NRIFIMANV'],
+            #= record['NRIFISPEV'], = record['CTIPCOMM'],
+            #= record['CTLIARTI'], = record['CFASCIA'],
+            #= record['CTLICOST'], = record['CTLIPREZ'],
+            #= record['NRICPREZ'], = record['LRICNOTE'],
+            #= record['LVALCOPR'], = record['NRMACOST'],
+            #= record['NRMAPREZ'], = record['LMANCOPR'],
+            #= record['NRSECOST'], = record['NRSEPREZ'],
+            #= record['LSEXCOPR'], = record['NKMPVIAGGI'],
+            #= record['NCOSVIAGGI'], = record['NPRZVIAGGI'],
+            #= record['LATTESA'], = record['LRICNOST'],
+            #= record['NRICMANO'], = record['NRICSPEX'],
+            #= record['DDATAANA'], = record['CCODPERS'],
+            #= record['CLISCECO'], = record['CSTATO'],
+            #= record['NRMTCOST'], = record['NSTSINCR'],
+            #= record['DATOPER'], = record['CORAOPER'],
+            #= record['CCODOPER'], = record['CCODUTEN'],
+            #= record['CCODRECO'], = record['LVALPRZV'],
+            #= record['NRICPRZV'], = record['CCODPRAT'],
+            #= record['CCONTORI'], = record['DDATCONS'],
+            #= record['CCODLUPR'], = record['NIMPCONT'],
+            #= record['NPERESEG'], = record['LVALCOMP'],
+            #= record['LVALTUOR'], = record['CFILLER2'],
+            #= record['NPERCOST'], = record['NPERPROV'],	
+            #= record['CCODAGEN'], = record['NPERRITG'],
+            #= record['NPERMUTA'], = record['CCODARTI'],
+            #= record['NQTAARTI'], = record['NPERPRO2'],
+            #= record['CCODAMMI'], = record['MMEMO1'],
+            #= record['MMEMOANA'], = record['MMEMOANA2'],
             #= record['MMEMOANA3'],
 
             data = {

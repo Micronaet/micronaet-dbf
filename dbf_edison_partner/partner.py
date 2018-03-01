@@ -55,26 +55,9 @@ class ResPartner(orm.Model):
         # ---------------------------------------------------------------------
         # Browse company: 
         company_pool = self.pool.get('res.company')
-        company_ids = company_pool.search(cr, uid, [], context=context)
-        company_proxy = company_pool.browse(
-            cr, uid, company_ids, context=context)[0]
-        
-        # Read parameter:    
-        dbf_root_path = os.path.expanduser(company_proxy.dbf_root_path)
-        dbf_ignorecase = company_proxy.dbf_ignorecase
-        dbf_memofile = company_proxy.dbf_memofile
-        dbf_encoding = company_proxy.dbf_encoding
 
-        # ---------------------------------------------------------------------
-        #                             CUSTOMER
-        # ---------------------------------------------------------------------
-        filename = os.path.join(dbf_root_path, 'TBCLIE.DBF')
-        db = DBF(
-            filename, 
-            ignorecase=dbf_ignorecase,
-            ignore_missing_memofile=dbf_memofile,
-            encoding=dbf_encoding,
-            )
+        db = company_pool.get_dbf_table(
+            cr, uid, 'TBCLIE.DBF', context=context)
             
         i = 0
         #XXX db.field_names
@@ -229,13 +212,8 @@ class ResPartner(orm.Model):
         # ---------------------------------------------------------------------
         #                             SUPPLIER
         # ---------------------------------------------------------------------
-        filename = os.path.join(dbf_root_path, 'TBFORN.DBF')
-        db = DBF(
-            filename, 
-            ignorecase=dbf_ignorecase,
-            ignore_missing_memofile=dbf_memofile,
-            encoding=dbf_encoding,
-            )
+        db = company_pool.get_dbf_table(
+            cr, uid, 'TBFORN.DBF', context=context)
             
         i = 0
         #XXX db.field_names
@@ -270,59 +248,33 @@ class ResPartner(orm.Model):
                 'email': record['CEMAIL'], 
                 'website': record['CSITOWEB'],
                 }
-                #'cprov': record['CPROV'], 
-                #'ccodaggi': record[CCODAGGI],
-                #'ddatulag': record[DDATULAG],
-                #'cfilelis': record[CFILELIS],
-                #'cesclcar': record[CESCLCAR],	
-                #'cteuforn': record[CTEUFORN], 
-                #'ctelrif': record[CTELRIF],	
-                #'ccodprag': record[CCODPRAG],
-                #'lflagages': record[LFLAGAGES],
-                #'nflagages': record[NFLAGAGES],
-                #'ccodbanc': record[CCODBANC],
-                #'ccodciva': record[CCODCIVA]	
-                #'ccodcopa': record[CCODCOPA],	
-                #'nscontex': record[NSCONTEX],	
-                #'ccontori': record[CCONTORI],
-                #'cstato': record[CSTATO],
-                #'ccontcorr': record[CCONTCORR],
-                #'nqualifi': record[NQUALIFI],
-                #'ccodcate': record[CCODCATE],	
-                #'ddatinse': record[DDATINSE],
-                #'criferim': record[CRIFERIM],
-                #'ccortatt': record[CCORTATT],
-                #'cversaggln': record[CVERSAGGLN],	
-                #'cfilepro': record[CFILEPRO],
-                #'cfilebar': record[CFILEBAR],
-                #'cfilefas': record[CFILEFAS],
-                #'cfilecav': record[CFILECAV],	
-                #'ccodagen': record[CCODAGEN],
-                #'lnoexpco': record[LNOEXPCO],
-                #'cnazione': record[CNAZIONE],
-                #'ccodcinn': record[CCODCINN],
-                #'ccodcine': record[CCODCINE],
-                #'nstsincr': record[NSTSINCR],
-                #'ddatoper': record[DDATOPER],
-                #'coraoper': record[CORAOPER],
-                #'ccodoper': record[CCODOPER],
-                #'ccoduten': record[CCODUTEN],
-                #'lpersona': record[LPERSONA]	
-                #'nqualif2': record[NQUALIF2],
-                #'nqualif3': record[NQUALIF3],
-               	#'cspediz': record[CSPEDIZ],	
-                #'ccodport': record[CCODPORT],
-                #'ccodzona': record[CCODZONA],
-                #'cemail2': record[CEMAIL2],
-                #'cpec': record[CPEC],	
-                #'mzona': record[MZONA],
-               	#'mnote': record[MNOTE],
-               	#'mnoteord': record[MNOTEORD],
-               	#'mprodser': record[MPRODSER],
-               	#'mvalanno': record[MVALANNO],	
-                #'mstrateg': record[MSTRATEG],
-               	#'mesitrif': record[MESITRIF],
-               	#'mrivalut': record[MRIVALUT],
+                #'cprov': record['CPROV'], 'ccodaggi': record[CCODAGGI],
+                #'ddatulag': record[DDATULAG], 'cfilelis': record[CFILELIS],
+                #'cesclcar': record[CESCLCAR], 'cteuforn': record[CTEUFORN], 
+                #'ctelrif': record[CTELRIF], 'ccodprag': record[CCODPRAG],
+                #'lflagages': record[LFLAGAGES], 'nflagages': record[NFLAGAGES],
+                #'ccodbanc': record[CCODBANC], 'ccodciva': record[CCODCIVA]    
+                #'ccodcopa': record[CCODCOPA], 'nscontex': record[NSCONTEX],    
+                #'ccontori': record[CCONTORI], 'cstato': record[CSTATO],
+                #'ccontcorr': record[CCONTCORR], 'nqualifi': record[NQUALIFI],
+                #'ccodcate': record[CCODCATE], 'ddatinse': record[DDATINSE],
+                #'criferim': record[CRIFERIM], 'ccortatt': record[CCORTATT],
+                #'cversaggln': record[CVERSAGGLN], 'cfilepro': record[CFILEPRO],
+                #'cfilebar': record[CFILEBAR], 'cfilefas': record[CFILEFAS],
+                #'cfilecav': record[CFILECAV], 'ccodagen': record[CCODAGEN],
+                #'lnoexpco': record[LNOEXPCO], 'cnazione': record[CNAZIONE],
+                #'ccodcinn': record[CCODCINN], 'ccodcine': record[CCODCINE],
+                #'nstsincr': record[NSTSINCR], 'ddatoper': record[DDATOPER],
+                #'coraoper': record[CORAOPER], 'ccodoper': record[CCODOPER],
+                #'ccoduten': record[CCODUTEN], 'lpersona': record[LPERSONA]    
+                #'nqualif2': record[NQUALIF2], 'nqualif3': record[NQUALIF3],
+                #'cspediz': record[CSPEDIZ], 'ccodport': record[CCODPORT],
+                #'ccodzona': record[CCODZONA], 'cemail2': record[CEMAIL2],
+                #'cpec': record[CPEC], 'mzona': record[MZONA],
+                #'mnote': record[MNOTE], 'mnoteord': record[MNOTEORD],
+                #'mprodser': record[MPRODSER], 'mvalanno': record[MVALANNO],    
+                #'mstrateg': record[MSTRATEG], 'mesitrif': record[MESITRIF],
+                #'mrivalut': record[MRIVALUT],
 
             # Search partner code:
             if vat: 
