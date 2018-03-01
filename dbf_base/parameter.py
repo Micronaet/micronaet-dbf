@@ -43,6 +43,32 @@ class res_company(orm.Model):
     '''
     _inherit = 'res.company'
 
+    def get_dbf_table(self, cr, uid, table, context=None):
+        ''' Read parameter and get table
+        '''
+        # Browse company: 
+        company_ids = self.search(cr, uid, [], context=context)
+        company_proxy = self.browse(
+            cr, uid, company_ids, context=context)[0]
+        
+        # Read parameter:    
+        dbf_root_path = os.path.expanduser(company_proxy.dbf_root_path)
+        dbf_ignorecase = company_proxy.dbf_ignorecase
+        dbf_memofile = company_proxy.dbf_memofile
+        dbf_encoding = company_proxy.dbf_encoding
+
+        # ---------------------------------------------------------------------
+        #                         ANALYTIC ACCOUNT:
+        # ---------------------------------------------------------------------
+        filename = os.path.join(dbf_root_path, table)
+        db = DBF(
+            filename, 
+            ignorecase=dbf_ignorecase,
+            ignore_missing_memofile=dbf_memofile,
+            encoding=dbf_encoding,
+            )
+        return db    
+        
     _columns = {
         'dbf_root_path': fields.char(
             'DBF Root path', size=180),
