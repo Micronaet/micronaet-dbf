@@ -35,9 +35,9 @@
                     <filter name="from_date_to" string="To date" domain="[('from_date','=','draft')]"/>-->
                 </field>                
 
-                <!--<filter name="group_partner" position="before">
+                <filter string="Status" position="before">
                     <filter name="group_date" string="Date" context="{'group_by': 'from_date'}" />
-                </filter>-->
+                </filter>
             </field>
         </record>
     </data>
