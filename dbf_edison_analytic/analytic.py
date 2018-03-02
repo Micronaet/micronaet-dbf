@@ -47,7 +47,7 @@ class AccountAnalyticAccount(orm.Model):
     _inherit = 'account.analytic.account'
     
     def schedule_dbf_edison_analytic_import(self, cr, uid, 
-            verbose_log_count=100, context=None):
+            verbose_log_count=100, with_address=False, context=None):
         ''' Import analytic from external DBF
         '''
         _logger.info('Start import account')    
@@ -101,7 +101,7 @@ class AccountAnalyticAccount(orm.Model):
             # Address partner (create):
             # -----------------------------------------------------------------
             address_id = False
-            if address_street:# or address_city:
+            if with_address and address_street:# or address_city:
                 address_ids = partner_pool.search(cr, uid, [
                     ('dbf_destination_code', '=', address_code)
                     ], context=context)
