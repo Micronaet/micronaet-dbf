@@ -11,6 +11,7 @@
 			    <page string="DBF connection">
 			        <group colspan="4" col="4">
 			           <field name="dbf_root_path" />
+			           <field name="dbf_log_path" />
 			           <field name="dbf_encoding" />
 			           <field name="dbf_ignorecase" />
 			           <field name="dbf_memofile" />

@@ -55,7 +55,7 @@ class res_company(orm.Model):
             _logger.error('No log file parameter in Company!')
             return False
             
-        data = '%s. [%s]: %s\n') % (
+        data = '%s. [%s]: %s\n' % (
             datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             mode,
             event,
