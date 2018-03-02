@@ -66,7 +66,7 @@ class ResPartner(orm.Model):
         log = company_pool.get_dbf_logevent
         log(log_file, 'Inizio importazione partner', mode='INFO')
 
-        i = 0
+        i, c, s = 0 # counters (total read, customer, supplier)
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
@@ -115,10 +115,12 @@ class ResPartner(orm.Model):
             if supplier_start and ref.startswith(supplier_start): # supplier
                 dbf_code = 'dbf_supplier_code'
                 data['supplier'] = True
+                s += 1
                 
             else: # customer
                 dbf_code = 'dbf_customer_code'
                 data['customer'] = True
+                c += 1
             data[dbf_code] = ref
             
             # Search partner code:
@@ -187,7 +189,12 @@ class ResPartner(orm.Model):
                             'Errore nell''inserimento dati, rif: %s' % ref,
                             mode='ERROR',
                             )
-        log(log_file, 'Fine importazione [Tot: %s]\n' % i, mode='INFO')
+        log(
+            log_file, 
+            'Fine importazione [Tot: %s (clienti: %s, fornitori: %s)]\n' % (
+                i, c, s),
+            mode='INFO',
+            )
         try:
             log_file.close()
         except:

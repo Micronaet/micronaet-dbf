@@ -94,7 +94,7 @@ class AccountAnalyticAccount(orm.Model):
             # Linked partner:
             # -----------------------------------------------------------------
             partner_ids = partner_pool.search(cr, uid, [
-                ('dbf_customer_code', '=', partner_code)
+                ('dbf_customer_code', '=', partner_code),
                 ], context=context)
 
             partner_id = False
