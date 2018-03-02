@@ -111,13 +111,14 @@ class ResPartner(orm.Model):
                 #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
                 #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
                 }
-            
             if supplier_start and ref.startswith(supplier_start): # supplier
+                _logger.info('Fornitore: %s' % ref) # XXX remove
                 dbf_code = 'dbf_supplier_code'
                 data['supplier'] = True
                 s += 1
                 
             else: # customer
+                _logger.info('Cliente: %s' % ref) # XXX remove
                 dbf_code = 'dbf_customer_code'
                 data['customer'] = True
                 c += 1
