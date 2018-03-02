@@ -35,7 +35,7 @@ msgstr "Data"
 #. module: dbf_edison_analytic
 #: field:account.analytic.account,from_date:0
 msgid "From Date"
-msgstr "Dalla data"
+msgstr "Data fissa"
 
 #. module: dbf_edison_analytic
 #: view:account.analytic.account:dbf_edison_analytic.view_account_analytic_date_search
