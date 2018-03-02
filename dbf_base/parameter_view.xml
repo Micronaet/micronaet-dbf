@@ -13,7 +13,7 @@
 			           <field name="dbf_root_path" />
 			           <newline/>
 			           <field name="dbf_log_path" />
-			           <field name="dbf_log_return" />
+			           <field name="dbf_linux_return" />
 			           
 			           <field name="dbf_encoding" />
 			           <field name="dbf_ignorecase" />

@@ -55,7 +55,7 @@ class res_company(orm.Model):
             datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             mode,
             event,
-            self.dbf_log_return,
+            self._log_return,
             )
 
         if not log_file:
@@ -75,7 +75,12 @@ class res_company(orm.Model):
         
         # Read parameter:    
         dbf_log_path = os.path.expanduser(company_proxy.dbf_log_path or '')
-        self.dbf_log_return = company_proxy.dbf_log_return
+
+        if company_proxy.dbf_linux_return:
+            self._log_return = '\n'
+        else:
+            self._log_return = '\r\n'
+            
         if not dbf_log_path:
             _logger.error('No log file (path not setup)')
             return
@@ -116,8 +121,8 @@ class res_company(orm.Model):
             'DBF Root path', size=180),
         'dbf_log_path': fields.char(
             'DBF Log path', size=180),
-        'dbf_log_return': fields.char(
-            'DBF Log return', size=5),
+        'dbf_linux_return': fields.boolean(
+            'DBF Linux return'),
         'dbf_ignorecase': fields.boolean(
             'DBF ignore case table name', 
             help='Capital name for files'),
@@ -133,6 +138,6 @@ class res_company(orm.Model):
         
     _defaults = {
         'dbf_encoding': lambda *x: 'LATIN',
-        'dbf_log_return': lambda *x: '\r\n',
+        'dbf_linux_return': lambda *x: True,
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
