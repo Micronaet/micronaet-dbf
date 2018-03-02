@@ -1,0 +1,43 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dbf_edison_partner
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-02 08:16+0000\n"
+"PO-Revision-Date: 2018-03-02 09:17+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: dbf_edison_partner
+#: field:res.partner,dbf_customer_code:0
+msgid "DBF customer code"
+msgstr "DBF codice cliente"
+
+#. module: dbf_edison_partner
+#: field:res.partner,dbf_destination_code:0
+msgid "DBF destination code"
+msgstr "DBF codice destinazione"
+
+#. module: dbf_edison_partner
+#: field:res.partner,dbf_import:0
+msgid "DBF import"
+msgstr "DBF importato"
+
+#. module: dbf_edison_partner
+#: field:res.partner,dbf_supplier_code:0
+msgid "DBF supplier code"
+msgstr "DBF codice fornitore"
+
+#. module: dbf_edison_partner
+#: model:ir.model,name:dbf_edison_partner.model_res_partner
+msgid "Partner"
+msgstr "Partner"

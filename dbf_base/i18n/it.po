@@ -1,0 +1,83 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* dbf_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-02 08:02+0000\n"
+"PO-Revision-Date: 2018-03-02 09:04+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: dbf_base
+#: selection:res.company,dbf_encoding:0
+msgid "ASCII"
+msgstr "ASCII"
+
+#. module: dbf_base
+#: help:res.company,dbf_ignorecase:0
+msgid "Capital name for files"
+msgstr "Nome maiuscolo per tutti i files"
+
+#. module: dbf_base
+#: model:ir.model,name:dbf_base.model_res_company
+msgid "Companies"
+msgstr "Aziende"
+
+#. module: dbf_base
+#: model:res.groups,name:dbf_base.group_dbf_manager
+msgid "DBF / Mananger"
+msgstr "DBF / Gestore"
+
+#. module: dbf_base
+#: model:res.groups,name:dbf_base.group_dbf_user
+msgid "DBF / User"
+msgstr "DBF / Utente"
+
+#. module: dbf_base
+#: field:res.company,dbf_root_path:0
+msgid "DBF Root path"
+msgstr "DBF Cartella base"
+
+#. module: dbf_base
+#: view:res.company:dbf_base.dbf_company_form_view
+msgid "DBF connection"
+msgstr "DBF connessione"
+
+#. module: dbf_base
+#: field:res.company,dbf_ignorecase:0
+msgid "DBF ignore case table name"
+msgstr "DBF ignora maiuscoli nel nome tabella"
+
+#. module: dbf_base
+#: field:res.company,dbf_memofile:0
+msgid "DBF ignore memofile"
+msgstr "DBF ignora memo file"
+
+#. module: dbf_base
+#: help:res.company,dbf_memofile:0
+msgid "Extra memo file for DBF is not present"
+msgstr "File extra per memo non presente"
+
+#. module: dbf_base
+#: selection:res.company,dbf_encoding:0
+msgid "Latin"
+msgstr "Latino"
+
+#. module: dbf_base
+#: selection:res.company,dbf_encoding:0
+msgid "UTF8"
+msgstr "UTF8"
+
+#. module: dbf_base
+#: field:res.company,dbf_encoding:0
+msgid "dbf_encoding"
+msgstr "dbf_encoding"
