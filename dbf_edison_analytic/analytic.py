@@ -47,7 +47,8 @@ class AccountAnalyticAccount(orm.Model):
     _inherit = 'account.analytic.account'
     
     def schedule_dbf_edison_analytic_import(self, cr, uid, 
-            verbose_log_count=100, with_address=False, context=None):
+            verbose_log_count=100, with_address=False, log_name='cantieri.log',
+            context=None):
         ''' Import analytic from external DBF
         '''
         _logger.info('Start import account')    
@@ -58,6 +59,11 @@ class AccountAnalyticAccount(orm.Model):
 
         db = company_pool.get_dbf_table(
             cr, uid, 'CANTIE.DBF', context=context)
+        # Log:
+        log_file = company_pool.get_dbf_logfile(
+            cr, uid, log_name, context=context)
+        log = company_pool.get_dbf_logevent
+        log(log_file, 'Inizio importazione cantieri', mode='INFO')
             
         i = 0
         for record in db:
@@ -93,7 +99,11 @@ class AccountAnalyticAccount(orm.Model):
 
             partner_id = False
             if len(partner_ids) > 1:
-                _logger.error('More then one partner code: %s' % partner_code)
+                log(
+                    log_file, 
+                    'Codice partner multiplo: %s' % partner_code, 
+                    mode='ERROR',
+                    )
             if partner_ids:
                 partner_id = partner_ids[0]
 
@@ -107,8 +117,11 @@ class AccountAnalyticAccount(orm.Model):
                     ], context=context)
                     
                 if len(address_ids) > 1:
-                    _logger.error(
-                        'More then one address code: %s' % address_code)
+                    log(
+                        log_file, 
+                        'Codice indirizzo multiplo: %s' % address_code, 
+                        mode='ERROR',
+                        )
                 address_data = {
                     'name': name,
                     'parent_id': partner_id,
@@ -157,13 +170,25 @@ class AccountAnalyticAccount(orm.Model):
                 ], context=context)
 
             if len(analytic_ids) > 1:
-                _logger.error('More account with code: %s' % code)
+                log(
+                    log_file, 
+                    'Codice commessa multiplo: %s' % code, 
+                    mode='ERROR',
+                    )
 
             if analytic_ids:
                 self.write(cr, uid, analytic_ids, data, context=context)
             else:
                 self.create(cr, uid, data, context=context)
-        _logger.info('End import account')    
+        log(
+            log_file, 
+            'Fine importazione cantieri [Tot.: %s]\n' % i,
+            mode='INFO',
+            )
+        try:
+            log_file.close()
+        except:
+            return False    
         return True        
             
     _columns = {
@@ -172,6 +197,7 @@ class AccountAnalyticAccount(orm.Model):
         }
    
     _defaults = {
-        'from_date': lambda *x: datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT),
+        'from_date': lambda *x: datetime.now().strftime(
+            DEFAULT_SERVER_DATE_FORMAT),
         }     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

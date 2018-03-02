@@ -152,7 +152,8 @@ class ResPartner(orm.Model):
                     # Try to remove vat
                     log(
                         log_file, 
-                        'Rimossa P IVA non valida: %s' % data['vat'],
+                        'Rimossa P. IVA non valida: %s [ref: %s]' % (
+                            data['vat'], ref),
                         mode='WARNING',
                         )
                     del(data['vat'])
@@ -173,7 +174,8 @@ class ResPartner(orm.Model):
                     # Try to remove vat
                     log(
                         log_file, 
-                        'Rimossa P IVA non valida: %s' % data['vat'],
+                        'Rimossa P. IVA non valida: %s [ref: %s]' % (
+                            data['vat'], ref),
                         mode='WARNING',
                         )
                     del(data['vat'])
@@ -185,7 +187,7 @@ class ResPartner(orm.Model):
                             'Errore nell''inserimento dati, rif: %s' % ref,
                             mode='ERROR',
                             )
-        log(log_file, 'Fine importazione\n', mode='INFO')
+        log(log_file, 'Fine importazione [Tot: %s]\n' % i, mode='INFO')
         try:
             log_file.close()
         except:

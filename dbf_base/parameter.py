@@ -51,15 +51,15 @@ class res_company(orm.Model):
     def get_dbf_logevent(self, log_file, event, mode='INFO', verbose=True):
         ''' Log event        
         '''
-        if not log_file:
-            _logger.error('No log file parameter in Company!')
-            return False
-            
-        data = '%s. [%s]: %s\n' % (
+        data = '%s [%-8s]: %s\n' % (
             datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             mode,
             event,
             )
+
+        if not log_file:
+            return False
+
         log_file.write(data)
         if verbose: 
             _logger.info(data.strip()) # TODO manage color mode
@@ -73,10 +73,14 @@ class res_company(orm.Model):
             cr, uid, company_ids, context=context)[0]
         
         # Read parameter:    
-        dbf_log_path = os.path.expanduser(company_proxy.dbf_log_path)
+        dbf_log_path = os.path.expanduser(company_proxy.dbf_log_path or '')
+        if not dbf_log_path:
+            _logger.error('No log file (path not setup)')
+            return
+            
         log_file = os.path.join(dbf_log_path, log_name)
         _logger.info('Import log file: %s' % log_file)
-        return open(log_file, 'w')        
+        return open(log_file, 'a')        
 
     # DB function:
     def get_dbf_table(self, cr, uid, table, context=None):
