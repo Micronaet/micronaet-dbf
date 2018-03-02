@@ -47,7 +47,8 @@ class ResPartner(orm.Model):
     _inherit = 'res.partner'
     
     def schedule_dbf_edison_partner_import(self, cr, uid, 
-            verbose_log_count=100, supplier_start='1', context=None):
+            verbose_log_count=100, supplier_start='1', log_name='partner.log',
+            context=None):
         ''' Import partner from external DBF
         '''
         # ---------------------------------------------------------------------
@@ -58,9 +59,14 @@ class ResPartner(orm.Model):
 
         db = company_pool.get_dbf_table(
             cr, uid, 'TBCLIE.DBF', context=context)
-            
+        
+        # Log:
+        log_file = company_pool.get_dbf_logfile(
+            cr, uid, log_name, context=context)
+        log = company_pool.get_dbf_logevent
+        log(log_file, 'Inizio importazione partner', mode='INFO')
+
         i = 0
-        #XXX db.field_names
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
@@ -132,7 +138,11 @@ class ResPartner(orm.Model):
                     
             partner_ids = self.search(cr, uid, domain, context=context)                
             if len(partner_ids) > 1:
-                _logger.error('Error more partner: %s (use first)' % name)
+                log(
+                    log_file, 
+                    'Errore partner multipli: %s (usato primo)' % name, 
+                    mode='ERROR',
+                    )
                 partner_ids = [partner_ids[0]]
                 
             if partner_ids:
@@ -140,25 +150,46 @@ class ResPartner(orm.Model):
                     self.write(cr, uid, partner_ids, data, context=context)
                 except:
                     # Try to remove vat
-                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    log(
+                        log_file, 
+                        'Rimossa P IVA non valida: %s' % data['vat'],
+                        mode='WARNING',
+                        )
                     del(data['vat'])
                     try:
                         self.write(
                             cr, uid, partner_ids, data, context=context)
                     except:
                         _logger.error('Error data: %s' % data)
-                                                
+                        log(
+                            log_file, 
+                            'Errore nell''inserimento dati, rif: %s' % ref,
+                            mode='ERROR',
+                            )
             else:
                 try:
                     self.create(cr, uid, data, context=context)                
                 except:
                     # Try to remove vat
-                    _logger.warning('Remove VAT: %s' % data['vat'])
+                    log(
+                        log_file, 
+                        'Rimossa P IVA non valida: %s' % data['vat'],
+                        mode='WARNING',
+                        )
                     del(data['vat'])
                     try:
                         self.create(cr, uid, data, context=context)                
                     except:
-                        _logger.error('Error data: %s' % data)
+                        log(
+                            log_file, 
+                            'Errore nell''inserimento dati, rif: %s' % ref,
+                            mode='ERROR',
+                            )
+        log(log_file, 'Fine importazione\n', mode='INFO')
+        try:
+            log_file.close()
+        except:
+            return False    
         return True        
             
     _columns = {

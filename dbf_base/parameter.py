@@ -44,6 +44,36 @@ class res_company(orm.Model):
     '''
     _inherit = 'res.company'
 
+    # -------------------------------------------------------------------------
+    #                                   UTLITY:
+    # -------------------------------------------------------------------------
+    # Log funciton:
+    def get_dbf_logevent(self, log_file, event, mode='INFO'):
+        ''' Log event        
+        '''
+        if not log_file:
+            _logger.error('No log file parameter in Company!')
+            return False
+        log_file.write('%s. [%s]: %s\n') % (
+            datetime.now().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            mode,
+            event,
+            )
+            
+    def get_dbf_logfile(self, cr, uid, log_name, context=None):
+        ''' Read parameter and get table
+        '''
+        # Browse company: 
+        company_ids = self.search(cr, uid, [], context=context)
+        company_proxy = self.browse(
+            cr, uid, company_ids, context=context)[0]
+        
+        # Read parameter:    
+        dbf_log_path = os.path.expanduser(company_proxy.dbf_log_path)
+        log_file = os.path.join(dbf_log_path, log_name)
+        return open(log_file, 'w')        
+
+    # DB function:
     def get_dbf_table(self, cr, uid, table, context=None):
         ''' Read parameter and get table
         '''
@@ -73,6 +103,8 @@ class res_company(orm.Model):
     _columns = {
         'dbf_root_path': fields.char(
             'DBF Root path', size=180),
+        'dbf_log_path': fields.char(
+            'DBF Log path', size=180),
         'dbf_ignorecase': fields.boolean(
             'DBF ignore case table name', 
             help='Capital name for files'),
