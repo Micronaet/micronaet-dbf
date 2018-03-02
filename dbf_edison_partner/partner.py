@@ -56,9 +56,6 @@ class ResPartner(orm.Model):
         # ---------------------------------------------------------------------
         # Browse company: 
         company_pool = self.pool.get('res.company')
-
-        db = company_pool.get_dbf_table(
-            cr, uid, 'TBCLIE.DBF', context=context)
         
         # Log:
         log_file = company_pool.get_dbf_logfile(
@@ -66,130 +63,153 @@ class ResPartner(orm.Model):
         log = company_pool.get_dbf_logevent
         log(log_file, 'Inizio importazione partner', mode='INFO')
 
+        # ---------------------------------------------------------------------
+        # Mapping:
+        # ---------------------------------------------------------------------
+        mapping_db = [ # DB and mapping fields:
+            ('TBCLIE.DBF', {
+                'ref': 'CCODCLIE',
+                'name1': 'CDESCLIE',
+                'name2': 'CDE2CLIE',
+                'phone': 'CTEACLIE',
+                'mobile': 'CTECCLIE',                
+                }),
+            #('TBFORN.DBF', {
+            #    'ref': 'CCODFORN'
+            #    'name1': 'CDESFORN',
+            #    'name2': 'CDE2FORN',
+            #    'phone': 'CTEAFORN',
+            #    'mobile': 'CTECFORN',
+            #    }),
+            ]
+        
         i = c = s = 0 # counters (total read, customer, supplier)
-        for record in db:
-            i += 1
-            if verbose_log_count and i % verbose_log_count == 0:
-                _logger.info('Import customer #: %s' % i)
-            
-            # Mapping fields:
-            ref = record['CCODCLIE']                
-            name = '%s%s' % (
-                record['CDESCLIE'] or '',
-                record['CDE2CLIE'] or '',
-                )
-            vat = record['CPARTIVA']
-            if vat and vat[:1].isdigit():
-                vat = 'IT%s' % vat
+        for db_name, mapping in mapping_db:
+            db = company_pool.get_dbf_table(
+                cr, uid, db_name, context=context)
+            for record in db:
+                i += 1
+                if verbose_log_count and i % verbose_log_count == 0:
+                    _logger.info('Import customer #: %s' % i)
                 
-            data = {
-                'is_company': True,
-                'dbf_import': True,
-                'ref': ref,
-                'name': name,
-                'street': record['CINDIR'],
-                'city': record['CCOMUNE'],
-                'zip': record['CCAP'],
-                'fiscalcode': record['CCODFISC'],
-                'vat': vat,
-                'phone': record['CTEACLIE'],
-                'mobile': record['CTECCLIE'],
-                'email': record['CEMAIL'], 
-                'website': record['CSITOWEB'],
-                #CDPROV CFASCIA CCODCOPA CCODBANC CCODCIVA CDESDESCR 
-                #CDESINDIR CDESCITTA 2CTEUCLIE CTELRIF CMESIMAN NCOSTMAN 
-                #DDATAMAN CTIPCLIE CCODZONA CTLIARSE CTLIARCO CNAZIONE
-                #LFLAGCEE CCODAGEN NSCONTEX CCODVETT CCODVALU
-                #CCODLIST CCONTORI CSTATO
-                #CCONTCORR NSPESEIN NSPEBOLL NSPETRAS CNUMDIC
-                #DDATDIC CNUMREG DDATREG LEFFRATE CFILLER
-                #NQUALIFI DDATINSE CRIFERIM CCORTATT LSPESEIN
-                #LSPEBOLL LNOEXPCO NSPEFISS CCODCINN CCODCINE
-                #NSCOFATT NSCOARFA NSTSINCR DDATOPER CORAOPER
-                #CCODOPER CCODUTEN NRICMANO NRICSPEX LPERSONA
-                #CFILLER1 CTEC2CLI CTELRIF2 CCODAMMI CCODPORT
-                #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
-                #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
-                }
-            if supplier_start and ref.startswith(supplier_start): # supplier
-                _logger.info('Fornitore: %s' % ref) # XXX remove
-                dbf_code = 'dbf_supplier_code'
-                data['supplier'] = True
-                s += 1
-                
-            else: # customer
-                _logger.info('Cliente: %s' % ref) # XXX remove
-                dbf_code = 'dbf_customer_code'
-                data['customer'] = True
-                c += 1
-            data[dbf_code] = ref
-            
-            # Search partner code:
-            if vat: 
-                domain = [
-                    '|', '|', 
-                    (dbf_code, '=', ref),
-                    ('name', '=', name),
-                    ('vat', '=', vat),
-                    ]
-            else: 
-                domain = [
-                    '|', 
-                    (dbf_code, '=', ref),
-                    ('name', '=', name),
-                    ]
-                    
-            partner_ids = self.search(cr, uid, domain, context=context)                
-            if len(partner_ids) > 1:
-                log(
-                    log_file, 
-                    'Errore partner multipli: %s (usato primo)' % name, 
-                    mode='ERROR',
+                # Mapping fields:
+                ref = record[mapping['ref']]
+                name = '%s%s' % (
+                    record[mapping['name1']] or '',
+                    record[mapping['name2']] or '',
                     )
-                partner_ids = [partner_ids[0]]
+                vat = record['CPARTIVA']
+                if vat and vat[:1].isdigit():
+                    vat = 'IT%s' % vat
+                    
+                data = {
+                    'is_company': True,
+                    'dbf_import': True,
+                    'ref': ref,
+                    'name': name,
+                    'street': record['CINDIR'],
+                    'city': record['CCOMUNE'],
+                    'zip': record['CCAP'],
+                    'fiscalcode': record['CCODFISC'],
+                    'vat': vat,
+                    'phone': record[mapping['phone']],
+                    'mobile': record[mapping['mobile']],
+                    'email': record['CEMAIL'], 
+                    'website': record['CSITOWEB'],
+                    #CDPROV CFASCIA CCODCOPA CCODBANC CCODCIVA CDESDESCR 
+                    #CDESINDIR CDESCITTA 2CTEUCLIE CTELRIF CMESIMAN NCOSTMAN 
+                    #DDATAMAN CTIPCLIE CCODZONA CTLIARSE CTLIARCO CNAZIONE
+                    #LFLAGCEE CCODAGEN NSCONTEX CCODVETT CCODVALU
+                    #CCODLIST CCONTORI CSTATO
+                    #CCONTCORR NSPESEIN NSPEBOLL NSPETRAS CNUMDIC
+                    #DDATDIC CNUMREG DDATREG LEFFRATE CFILLER
+                    #NQUALIFI DDATINSE CRIFERIM CCORTATT LSPESEIN
+                    #LSPEBOLL LNOEXPCO NSPEFISS CCODCINN CCODCINE
+                    #NSCOFATT NSCOARFA NSTSINCR DDATOPER CORAOPER
+                    #CCODOPER CCODUTEN NRICMANO NRICSPEX LPERSONA
+                    #CFILLER1 CTEC2CLI CTELRIF2 CCODAMMI CCODPORT
+                    #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
+                    #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
+                    }
+                if supplier_start and ref.startswith(supplier_start): #supplier
+                    _logger.info('Fornitore: %s' % ref) # XXX remove
+                    dbf_code = 'dbf_supplier_code'
+                    data['supplier'] = True
+                    s += 1
+                    
+                else: # customer
+                    _logger.info('Cliente: %s' % ref) # XXX remove
+                    dbf_code = 'dbf_customer_code'
+                    data['customer'] = True
+                    c += 1
+                data[dbf_code] = ref
                 
-            if partner_ids:
-                try:
-                    self.write(cr, uid, partner_ids, data, context=context)
-                except:
-                    # Try to remove vat
+                # Search partner code:
+                if vat: 
+                    domain = [
+                        '|', '|', 
+                        (dbf_code, '=', ref),
+                        ('name', '=', name),
+                        ('vat', '=', vat),
+                        ]
+                else: 
+                    domain = [
+                        '|', 
+                        (dbf_code, '=', ref),
+                        ('name', '=', name),
+                        ]
+                        
+                partner_ids = self.search(cr, uid, domain, context=context)                
+                if len(partner_ids) > 1:
                     log(
                         log_file, 
-                        'Rimossa P. IVA non valida: %s [ref: %s]' % (
-                            data['vat'], ref),
-                        mode='WARNING',
+                        'Errore partner multipli: %s (usato primo)' % name, 
+                        mode='ERROR',
                         )
-                    del(data['vat'])
+                    partner_ids = [partner_ids[0]]
+                    
+                if partner_ids:
                     try:
-                        self.write(
-                            cr, uid, partner_ids, data, context=context)
+                        self.write(cr, uid, partner_ids, data, context=context)
                     except:
-                        _logger.error('Error data: %s' % data)
+                        # Try to remove vat
                         log(
                             log_file, 
-                            'Errore nell''inserimento dati, rif: %s' % ref,
-                            mode='ERROR',
+                            'Rimossa P. IVA non valida: %s [ref: %s]' % (
+                                data['vat'], ref),
+                            mode='WARNING',
                             )
-            else:
-                try:
-                    self.create(cr, uid, data, context=context)                
-                except:
-                    # Try to remove vat
-                    log(
-                        log_file, 
-                        'Rimossa P. IVA non valida: %s [ref: %s]' % (
-                            data['vat'], ref),
-                        mode='WARNING',
-                        )
-                    del(data['vat'])
+                        del(data['vat'])
+                        try:
+                            self.write(
+                                cr, uid, partner_ids, data, context=context)
+                        except:
+                            _logger.error('Error data: %s' % data)
+                            log(
+                                log_file, 
+                                'Errore nell''inserimento dati, rif: %s' % ref,
+                                mode='ERROR',
+                                )
+                else:
                     try:
                         self.create(cr, uid, data, context=context)                
                     except:
+                        # Try to remove vat
                         log(
                             log_file, 
-                            'Errore nell''inserimento dati, rif: %s' % ref,
-                            mode='ERROR',
+                            'Rimossa P. IVA non valida: %s [ref: %s]' % (
+                                data['vat'], ref),
+                            mode='WARNING',
                             )
+                        del(data['vat'])
+                        try:
+                            self.create(cr, uid, data, context=context)                
+                        except:
+                            log(
+                                log_file, 
+                                'Errore nell''inserimento dati, rif: %s' % ref,
+                                mode='ERROR',
+                                )
         log(
             log_file, 
             'Fine importazione [Tot: %s (clienti: %s, fornitori: %s)]\n' % (
