@@ -66,7 +66,7 @@ class ResPartner(orm.Model):
         log = company_pool.get_dbf_logevent
         log(log_file, 'Inizio importazione partner', mode='INFO')
 
-        i, c, s = 0 # counters (total read, customer, supplier)
+        i = c = s = 0 # counters (total read, customer, supplier)
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
