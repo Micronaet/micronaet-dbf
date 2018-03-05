@@ -73,7 +73,7 @@ class HrAnalyticTimesheet(orm.Model):
             ('dbf_code', '!=', False)], context=context)
         for user in user_pool.browse(
                 cr, uid, user_ids, context=context):
-            account_db[user.dbf_code] = user.id
+            user_db[user.dbf_code] = user.id
 
         # Analytic account:
         account_db = {}
@@ -98,7 +98,7 @@ class HrAnalyticTimesheet(orm.Model):
         
         current_ids = []    
         db = company_pool.get_dbf_table(cr, uid, 'RAPPOR.DBF', context=context)
-        i = 0        
+        i = j = 0 # total and jumped
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
@@ -115,7 +115,7 @@ class HrAnalyticTimesheet(orm.Model):
             unit_price = record['NPREZZOH']            
             
             # Calculated:
-            dbf_key = '%s-%s-%s' % date, hour, user_code
+            dbf_key = '%s-%s-%s' % (date, hour, user_code)
             name = ''            
             date_start = '%s 08:00:00' % date.strftime( # TODO change hour
                 DEFAULT_SERVER_DATE_FORMAT)
@@ -135,6 +135,7 @@ class HrAnalyticTimesheet(orm.Model):
             # -----------------------------------------------------------------
             # Analytic account:
             if account_code not in account_db:
+                j += 1
                 if account_code not in account_code_error:
                     account_code_error.append(account_code)
                     log(log_file, 
@@ -161,14 +162,14 @@ class HrAnalyticTimesheet(orm.Model):
                 'intervent_partner_id': partner_id,
                 'account_id': account_id,
                 'user_id': user_id,
-                'date_start': date_start
+                'date_start': date_start,
                 'intervent_duration': hour,
                 'intervent_total': hour,
                 'name': name,
                 'intervention_request': name,
                 'intervention': name,
                 'mode': 'customer', # 'phone', 
-                'ref': '#IMPORT'
+                'ref': '#IMPORT',
                 'amount': amount,
                 #'product_uom_id': 
                 #'to_invoice': 
@@ -187,7 +188,7 @@ class HrAnalyticTimesheet(orm.Model):
             
             if intervent_ids: # Update
                 self.write(cr, uid, intervent_ids[0], data, context=context)
-                current_ids.append(intervent_ids[0]
+                current_ids.append(intervent_ids[0])
             else: # Create
                 self.create(cr, uid, data, context=context)
         
@@ -202,7 +203,8 @@ class HrAnalyticTimesheet(orm.Model):
             self.unlink(cr, uid, remove_ids, context=context)
 
         log(log_file, 
-            'Fine importazione interventi [Tot.: %s]\n' % i,
+            'Fine importazione interventi [Totale: %s - Saltati: %s]\n' % (
+                i, j),
             mode='INFO',
             )
         try:
