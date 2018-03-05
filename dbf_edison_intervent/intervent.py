@@ -55,6 +55,7 @@ class HrAnalyticTimesheet(orm.Model):
         company_pool = self.pool.get('res.company')
         account_pool = self.pool.get('account.analytic.account')
         user_pool = self.pool.get('res.users')        
+        employee_pool = self.pool.get('hr.employee')
 
         # Log:
         log_file = company_pool.get_dbf_logfile(
@@ -73,6 +74,13 @@ class HrAnalyticTimesheet(orm.Model):
         for user in user_pool.browse(
                 cr, uid, user_ids, context=context):
             user_db[user.dbf_code] = user.id
+
+        # User:
+        employee_db = {}
+        employee_ids = employee_pool.search(cr, uid, [], context=context)
+        for employee in employee_pool.browse(
+                cr, uid, employee_ids, context=context):
+            employee_db[employee.user_id.id] = employee
 
         # Analytic account:
         account_db = {}
@@ -94,6 +102,7 @@ class HrAnalyticTimesheet(orm.Model):
         # Error will be comunicated once:
         user_code_error = []
         account_code_error = []
+        employee_error = []
         
         current_ids = []    
         db = company_pool.get_dbf_table(cr, uid, 'RAPPOR.DBF', context=context)
@@ -107,18 +116,20 @@ class HrAnalyticTimesheet(orm.Model):
             # Read data from DBF:
             # -----------------------------------------------------------------
             # DBF:
-            account_code = record['CCODCANT']
+            account_code = record['CCODCANT']            
             date = record['DDATRAPP']
             hour = record['NORE']
             user_code = record['CCODUTEN']
             unit_price = record['NPREZZOH']            
             
             # Calculated:
+            account_code = account_code[2:] # XXX Remove start 2 code
             dbf_key = '%s-%s-%s' % (date, hour, user_code)
-            name = ''            
+            name = 'Intervento importato'            
             date_start = '%s 08:00:00' % date.strftime( # TODO change hour
                 DEFAULT_SERVER_DATE_FORMAT)
             amount = unit_price * hour # TODO
+            journal_id = False # 
             
             #CCODPERS ?
             #DDATOPER CORAOPER
@@ -142,24 +153,35 @@ class HrAnalyticTimesheet(orm.Model):
                         mode='ERROR',
                         )
                 continue
-            account_id = account_db[account_code].id    
-            partner_id = account_db[account_code].partner_id.id
+            account = account_db[account_code]
 
             # User
+            user_id = admin_id # default
             if user_code in user_db: 
-                user_id = user_db[user_code] or admin_id
+                user_id = user_db[user_code]
             elif user_code not in user_code_error:
                 user_code_error.append(user_code)
                 log(log_file, 
-                    'Codice utente non trovata: %s' % user_code, 
+                    'Codice utente non trovato (uso admin): %s' % user_code, 
                     mode='ERROR',
                     )
+
+            # Employee
+            if user_id not in employee_db: 
+                if user_id not in employee_error:
+                    employee_error.append(user_id)                    
+                    log(log_file, 
+                        'Impiegato non trovato per codice; %s' % user_code, 
+                        mode='ERROR',
+                        )
+                continue 
+            employee = employee_db[user_id]
             
             data = {
                 'dbf_import': True,                
                 'dbf_key': dbf_key,
-                'intervent_partner_id': partner_id,
-                'account_id': account_id,
+                'intervent_partner_id': account.partner_id.id,
+                'account_id': account.id,
                 'user_id': user_id,
                 'date_start': date_start,
                 'intervent_duration': hour,
@@ -170,9 +192,10 @@ class HrAnalyticTimesheet(orm.Model):
                 'mode': 'customer', # 'phone', 
                 'ref': '#IMPORT',
                 'amount': amount,
-                # TODO
-                #'product_uom_id': 
-                #'to_invoice': 
+                'journal_id': employee.journal_id.id,
+                'product_uom_id': employee.product_id.uom_id.id,
+                'to_invoice': account.default_to_invoice,
+                # TODO #'to_invoice': 
                 }
             
             intervent_ids = self.search(cr, uid, [
@@ -206,6 +229,7 @@ class HrAnalyticTimesheet(orm.Model):
                 i, j),
             mode='INFO',
             )
+        # TODO workflow operations!?!    
         try:
             log_file.close()
         except:
