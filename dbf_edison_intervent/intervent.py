@@ -54,70 +54,133 @@ class HrAnalyticTimesheet(orm.Model):
 
         # Pool used:
         company_pool = self.pool.get('res.company')
-        partner_pool = self.pool.get('res.partner')
-        
-        db = company_pool.get_dbf_table(
-            cr, uid, 'RAPPOR.DBF', context=context)
+        account_pool = self.pool.get('account.analytic.account')
+        user_pool = self.pool.get('res.users')        
 
+        # ---------------------------------------------------------------------
+        # Load foreign keys database:
+        # ---------------------------------------------------------------------
+        # User:
+        admin_id = 1
+        user_db = {}
+        user_ids = user_pool.search(cr, uid, [
+            ('dbf_code', '!=', False)], context=context)
+        for user in user_pool.browse(
+                cr, uid, user_ids, context=context):
+            account_db[user.dbf_code] = user.id
+
+        # Analytic account:
+        account_db = {}
+        account_ids = account_pool.search(cr, uid, [(
+            'dbf_import', '=', True)], context=context)
+        for account in account_pool.browse(
+                cr, uid, account_ids, context=context):
+            account_db[account.code] = account
+
+        # ---------------------------------------------------------------------
+        # Load intervent:
+        # ---------------------------------------------------------------------
+        # Load previous for delete extra intervent
+        previous_ids = self.search(cr, uid, [
+            ('dbf_import', '=', True),
+            ], context=context)
+        previous_ids = set(previous_ids)    
+        
+        current_ids = []    
+        db = company_pool.get_dbf_table(cr, uid, 'RAPPOR.DBF', context=context)
         i = 0
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.warning('Import intervent #: %s' % i)
+
+            # -----------------------------------------------------------------
+            # Read data from DBF:
+            # -----------------------------------------------------------------
+            # DBF:
+            account_code = record['CCODCANT']
+            date = record['DDATRAPP']
+            hour = record['NORE']
+            user_code = record['CCODUTEN']
+            unit_price = record['NPREZZOH']            
+            
+            # Calculated:
+            dbf_key = '%s-%s-%s' % date, hour, user_code
+            name = ''            
+            date_start = '%s 08:00:00' % date.strftime( # TODO change hour
+                DEFAULT_SERVER_DATE_FORMAT)
+            amount = unit_price * hour # TODO
+            
+            #CCODPERS ?
+            #DDATOPER CORAOPER
+            #CCODCAUS CCODCECO CDESCAUS CFASCIA LORESTRA CCODPRLO
+            #CCODARTI COREINIZ COREFINE CMININIZ CMINFINE CRIFPART LFATT 
+            #CRIFFATT LNOFATT CCODSOCO NKMPERCO NTURNI NTRASFER NVIAGGIO 
+            #CCODORDLA CCODREP CCODRAPP COREINI2 COREFIN2 CMININI2 CMINFIN2
+            #CCODSOFA NSTSINCR CCODOPER CCODRAP2 CCODORDL CFILEPDF CCODBARR
+            #MSEGNALA MMEMO
             
             # -----------------------------------------------------------------
-            # Mapping fields (readability):
+            # Related fiels:            
             # -----------------------------------------------------------------
-            # Analytic account ref:
-            #code = '%s%s' % (
-            #    '', # record['CANNCANT'] or '', # TODO remove year
-            #    record['CNUMCANT'] or '',
-            #    )                                
-            #name = record['CDESCANT'] or ''
+            # Analytic account:
+            if account_code not in account_db:
+                error = 'Analytic account not found: %s' % account_code
+                continue
+            account_id = account_db[account_code].id    
+            partner_id = account_db[account_code].partner_id.id
+
+            # User
+            if user_code in user_db: 
+                user_id = user_db[user_code] or admin_id
+            else:    
+                warning = 'User code not found: %s' % user_code
             
-            # Partner ref.:
-            #partner_code = record['CCODCLIE'] or ''
-
-            # -----------------------------------------------------------------
-            # Linked partner:
-            # -----------------------------------------------------------------
-            #partner_ids = partner_pool.search(cr, uid, [
-            #    ('dbf_customer_code', '=', partner_code)
-            #    ], context=context)
-
-            #partner_id = False
-            #if len(partner_ids) > 1:
-            #    _logger.error('More then one partner code: %s' % partner_code)
-            #if partner_ids:
-            #    partner_id = partner_ids[0]
-
             data = {
-                'dbf_import': True,
-                #'code': code,
-                #'name': name,
-                #'partner_id': partner_id,
-                #'address_id': address_id,
-                #'type': 'normal', 
-                #'use_timesheets': True,
+                'dbf_import': True,                
+                'dbf_key': dbf_key,
+                'intervent_partner_id': partner_id,
+                'account_id': account_id,
+                'user_id': user_id,
+                'date_start': date_start
+                'intervent_duration': hour,
+                'intervent_total': hour,
+                'name': name,
+                'intervention_request': name,
+                'intervention': name,
+                'mode': 'customer', # 'phone', 
+                'ref': '#IMPORT'
+                'amount': amount,
+                #'product_uom_id': 
+                #'to_invoice': 
+                # TODO
                 }
-                
-            # Search partner code:
+            
             intervent_ids = self.search(cr, uid, [
-                #('code', '=', code),
+                ('dbf_key', '=', dbf_key),
                 ], context=context)
 
-            #if len(intervent_ids) > 1:
-            #    _logger.error('More account with code: %s' % code)
+            if len(intervent_ids) > 1: 
+                warning = 'More than one DBF key: %s' % dbf_key
+            
+            if intervent_ids: # Update
+                self.write(cr, uid, intervent_ids[0], data, context=context)
+                current_ids.append(intervent_ids[0]
+            else: # Create
+                self.create(cr, uid, data, context=context)
+        
+        current_ids = set(current_ids)    
+        remove_ids = previous_ids - current_ids
+        if remove_ids:
+            warning = 'Delete %s intervent!' % len(remove_ids)
+            self.unlink(cr, uid, remove_ids, context=context)
 
-            #if intervent_ids:
-            #    self.write(cr, uid, analytic_ids, data, context=context)
-            #else:
-            #    self.create(cr, uid, data, context=context)
         _logger.info('End import intervent')    
         return True        
             
     _columns = {
         'dbf_import': fields.boolean('DBF import'),
+        'dbf_key': fields.char('DBF Code', size=40), # generated key
         }
 
 class ResUsers(orm.Model):
@@ -126,8 +189,6 @@ class ResUsers(orm.Model):
     _inherit = 'res.users'
     
     _columns = {
-        'dbf_code': fields.boolean('DBF Code', 
-            help='Used for link user to intervent',
-            ),
+        'dbf_code': fields.char('DBF Code', size=8),
         }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

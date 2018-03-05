@@ -47,7 +47,7 @@ class ResPartner(orm.Model):
     _inherit = 'res.partner'
     
     def schedule_dbf_edison_partner_import(self, cr, uid, 
-            verbose_log_count=100, supplier_start='1', log_name='partner.log',
+            verbose_log_count=100, log_name='partner.log',
             context=None):
         ''' Import partner from external DBF
         '''
@@ -67,24 +67,24 @@ class ResPartner(orm.Model):
         # Mapping:
         # ---------------------------------------------------------------------
         mapping_db = [ # DB and mapping fields:
-            ('TBCLIE.DBF', {
+            ('customer', 'TBCLIE.DBF', {
                 'ref': 'CCODCLIE',
                 'name1': 'CDESCLIE',
                 'name2': 'CDE2CLIE',
                 'phone': 'CTEACLIE',
                 'mobile': 'CTECCLIE',                
                 }),
-            #('TBFORN.DBF', {
-            #    'ref': 'CCODFORN'
-            #    'name1': 'CDESFORN',
-            #    'name2': 'CDE2FORN',
-            #    'phone': 'CTEAFORN',
-            #    'mobile': 'CTECFORN',
-            #    }),
+            ('supplier', 'TBFORN.DBF', {
+                'ref': 'CCODFORN',
+                'name1': 'CDESFORN',
+                'name2': 'CDE2FORN',
+                'phone': 'CTEAFORN',
+                'mobile': 'CTECFORN',
+                }),
             ]
         
         i = c = s = 0 # counters (total read, customer, supplier)
-        for db_name, mapping in mapping_db:
+        for mode, db_name, mapping in mapping_db:
             db = company_pool.get_dbf_table(
                 cr, uid, db_name, context=context)
             for record in db:
@@ -105,7 +105,6 @@ class ResPartner(orm.Model):
                 data = {
                     'is_company': True,
                     'dbf_import': True,
-                    'ref': ref,
                     'name': name,
                     'street': record['CINDIR'],
                     'city': record['CCOMUNE'],
@@ -131,32 +130,26 @@ class ResPartner(orm.Model):
                     #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
                     #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
                     }
-                if supplier_start and ref.startswith(supplier_start): #supplier
-                    _logger.info('Fornitore: %s' % ref) # XXX remove
+                if mode == 'supplier':
                     dbf_code = 'dbf_supplier_code'
                     data['supplier'] = True
-                    s += 1
-                    
+                    s += 1                    
                 else: # customer
-                    _logger.info('Cliente: %s' % ref) # XXX remove
                     dbf_code = 'dbf_customer_code'
                     data['customer'] = True
+                    data['ref'] = ref
                     c += 1
                 data[dbf_code] = ref
                 
                 # Search partner code:
                 if vat: 
-                    domain = [
-                        '|', '|', 
-                        (dbf_code, '=', ref),
-                        ('name', '=', name),
+                    domain = ['|', '|', 
+                        (dbf_code, '=', ref), ('name', '=', name),
                         ('vat', '=', vat),
                         ]
                 else: 
-                    domain = [
-                        '|', 
-                        (dbf_code, '=', ref),
-                        ('name', '=', name),
+                    domain = ['|', 
+                        (dbf_code, '=', ref), ('name', '=', name),
                         ]
                         
                 partner_ids = self.search(cr, uid, domain, context=context)                
@@ -171,8 +164,7 @@ class ResPartner(orm.Model):
                 if partner_ids:
                     try:
                         self.write(cr, uid, partner_ids, data, context=context)
-                    except:
-                        # Try to remove vat
+                    except: # Try removing vat
                         log(
                             log_file, 
                             'Rimossa P. IVA non valida: %s [ref: %s]' % (
@@ -193,8 +185,7 @@ class ResPartner(orm.Model):
                 else:
                     try:
                         self.create(cr, uid, data, context=context)                
-                    except:
-                        # Try to remove vat
+                    except: # Try removing vat
                         log(
                             log_file, 
                             'Rimossa P. IVA non valida: %s [ref: %s]' % (
