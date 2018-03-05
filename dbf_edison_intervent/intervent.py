@@ -42,8 +42,7 @@ _logger = logging.getLogger(__name__)
 
 class HrAnalyticTimesheet(orm.Model):
     ''' Model name: Analytic Account
-    '''
-    
+    '''    
     _inherit = 'hr.analytic.timesheet'
     
     def schedule_dbf_edison_intervent_import(self, cr, uid, 
@@ -171,9 +170,9 @@ class HrAnalyticTimesheet(orm.Model):
                 'mode': 'customer', # 'phone', 
                 'ref': '#IMPORT',
                 'amount': amount,
+                # TODO
                 #'product_uom_id': 
                 #'to_invoice': 
-                # TODO
                 }
             
             intervent_ids = self.search(cr, uid, [
