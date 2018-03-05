@@ -59,6 +59,7 @@ class AccountAnalyticAccount(orm.Model):
 
         db = company_pool.get_dbf_table(
             cr, uid, 'CANTIE.DBF', context=context)
+
         # Log:
         log_file = company_pool.get_dbf_logfile(
             cr, uid, log_name, context=context)

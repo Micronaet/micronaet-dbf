@@ -47,7 +47,7 @@ class HrAnalyticTimesheet(orm.Model):
     _inherit = 'hr.analytic.timesheet'
     
     def schedule_dbf_edison_intervent_import(self, cr, uid, 
-            verbose_log_count=100, context=None):
+            verbose_log_count=100, log_name='interventi.log', context=None):
         ''' Import analytic from external DBF
         '''
         _logger.info('Start import account')    
@@ -56,6 +56,12 @@ class HrAnalyticTimesheet(orm.Model):
         company_pool = self.pool.get('res.company')
         account_pool = self.pool.get('account.analytic.account')
         user_pool = self.pool.get('res.users')        
+
+        # Log:
+        log_file = company_pool.get_dbf_logfile(
+            cr, uid, log_name, context=context)
+        log = company_pool.get_dbf_logevent
+        log(log_file, 'Inizio importazione interventi', mode='INFO')
 
         # ---------------------------------------------------------------------
         # Load foreign keys database:
@@ -86,9 +92,13 @@ class HrAnalyticTimesheet(orm.Model):
             ], context=context)
         previous_ids = set(previous_ids)    
         
+        # Error will be comunicated once:
+        user_code_error = []
+        account_code_error = []
+        
         current_ids = []    
         db = company_pool.get_dbf_table(cr, uid, 'RAPPOR.DBF', context=context)
-        i = 0
+        i = 0        
         for record in db:
             i += 1
             if verbose_log_count and i % verbose_log_count == 0:
@@ -125,7 +135,12 @@ class HrAnalyticTimesheet(orm.Model):
             # -----------------------------------------------------------------
             # Analytic account:
             if account_code not in account_db:
-                error = 'Analytic account not found: %s' % account_code
+                if account_code not in account_code_error:
+                    account_code_error.append(account_code)
+                    log(log_file, 
+                        'Conto analitico non trovato: %s' % account_code, 
+                        mode='ERROR',
+                        )
                 continue
             account_id = account_db[account_code].id    
             partner_id = account_db[account_code].partner_id.id
@@ -133,8 +148,12 @@ class HrAnalyticTimesheet(orm.Model):
             # User
             if user_code in user_db: 
                 user_id = user_db[user_code] or admin_id
-            else:    
-                warning = 'User code not found: %s' % user_code
+            elif user_code not in user_code_error:
+                user_code_error.append(user_code)
+                log(log_file, 
+                    'Codice utente non trovata: %s' % user_code, 
+                    mode='ERROR',
+                    )
             
             data = {
                 'dbf_import': True,                
@@ -160,8 +179,11 @@ class HrAnalyticTimesheet(orm.Model):
                 ('dbf_key', '=', dbf_key),
                 ], context=context)
 
-            if len(intervent_ids) > 1: 
-                warning = 'More than one DBF key: %s' % dbf_key
+            if len(intervent_ids) > 1:                 
+                log(log_file, 
+                    'Chiave duplicata: : %s' % dbf_key,
+                    mode='WARNING',
+                    )
             
             if intervent_ids: # Update
                 self.write(cr, uid, intervent_ids[0], data, context=context)
@@ -172,10 +194,21 @@ class HrAnalyticTimesheet(orm.Model):
         current_ids = set(current_ids)    
         remove_ids = previous_ids - current_ids
         if remove_ids:
-            warning = 'Delete %s intervent!' % len(remove_ids)
+            log(log_file, 
+                'Cancellazione interventi extra tot.:%s!' % len(remove_ids),
+                mode='WARNING',
+                )
+            
             self.unlink(cr, uid, remove_ids, context=context)
 
-        _logger.info('End import intervent')    
+        log(log_file, 
+            'Fine importazione interventi [Tot.: %s]\n' % i,
+            mode='INFO',
+            )
+        try:
+            log_file.close()
+        except:
+            return False
         return True        
             
     _columns = {
