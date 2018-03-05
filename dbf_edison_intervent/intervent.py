@@ -177,7 +177,7 @@ class HrAnalyticTimesheet(orm.Model):
                 continue 
             employee = employee_db[user_id]
             
-            data = {
+            data = {            
                 'dbf_import': True,                
                 'dbf_key': dbf_key,
                 'intervent_partner_id': account.partner_id.id,
@@ -195,7 +195,12 @@ class HrAnalyticTimesheet(orm.Model):
                 'journal_id': employee.journal_id.id,
                 'product_uom_id': employee.product_id.uom_id.id,
                 'to_invoice': account.default_to_invoice,
-                # TODO #'to_invoice': 
+                # XXX Mode customer:
+                'google_from': 'company',
+                'google_to': 'company',
+                # Creation parameter:
+                'create_date': date_start,
+                'write_date': date_start,
                 }
             
             intervent_ids = self.search(cr, uid, [
