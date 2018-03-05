@@ -66,7 +66,7 @@ class HrAnalyticTimesheet(orm.Model):
         # Load foreign keys database:
         # ---------------------------------------------------------------------
         # User:
-        admin_id = 1
+        admin_id = 1 # XXX
         user_db = {}
         user_ids = user_pool.search(cr, uid, [
             ('dbf_code', '!=', False)], context=context)
