@@ -195,9 +195,11 @@ class HrAnalyticTimesheet(orm.Model):
                 'journal_id': employee.journal_id.id,
                 'product_uom_id': employee.product_id.uom_id.id,
                 'to_invoice': account.default_to_invoice,
+
                 # XXX Mode customer:
                 'google_from': 'company',
                 'google_to': 'company',
+
                 # Creation parameter:
                 'create_date': date_start,
                 'write_date': date_start,
