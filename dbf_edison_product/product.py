@@ -56,6 +56,7 @@ class ProductProduct(orm.Model):
         # ---------------------------------------------------------------------
         # Browse company: 
         company_pool = self.pool.get('res.company')
+        category_pool = self.pool.get('product.category')
         
         # Log:
         log_file = company_pool.get_dbf_logfile(
@@ -69,45 +70,35 @@ class ProductProduct(orm.Model):
         db_name = 'ARTICO.DBF'
         
         i = 0
-        artico = open(
-            '/opt/odoo/.local/share/Odoo/mount/edison/DATI/artico.csv', 'w') # XXX remove
-        #import pdb; pdb.set_trace()
+        producer_db = {}
+        import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
-            metel_producer_code = record['CCODPROD']
-            if len(metel_producer_code or '') >=3:
-                # XXX continue
-                use = False
-            else:    
-                use = True
             i += 1
 
-            # -----------------------------------------------------------------
-            # XXX REMOVE:
-            line = '%s|%s|%s|%s\n' % (
-                'X' if use else '',
-                record['CCODARTI'],
-                record['CDESARTI'],
-                metel_producer_code,
-                )
-            res = ''
-            for c in line:
-                if ord(c) <= 127:
-                    res += c
-                else:
-                    res += '_'
-                    
-            artico.write(res)
-            continue
-            # XXX REMOVE:
-            # -----------------------------------------------------------------
-    
+            # -----------------------------------------------------------------    
+            # Field:
+            # -----------------------------------------------------------------    
+            metel_producer_code = record['CCODPROD']
+            default_code = record['CCODARTI']
+            name = record['CDESARTI']
+
+            if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
+                continue
+
+            # Metel producer code information:
+            metel_producer_code = '%s-' % metel_producer_code
+            if metel_producer_code in producer_db:
+                metel_producer_id = producer_db.get[metel_producer_code]
+            else:
+                metel_producer_id = category_pool.get_create_producer_group(
+                    cr, uid, metel_producer_code, metel_producer_code,
+                    context=context)
+
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
             
             # Mapping fields:
-            default_code = record['CCODARTI']
-            name = record['CDESARTI']
             data = {
                 'dbf_import': True,
                 'default_code': default_code,
@@ -134,7 +125,8 @@ class ProductProduct(orm.Model):
                 'description': record['MMEMO'],
                 
                 #'metel_electrocod':
-                #'metel_producer_code'
+                'metel_producer_code': metel_producer_code,
+                'metel_producer_id': metel_producer_id,
                 }
                 
             # Search product code:
