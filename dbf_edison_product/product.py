@@ -96,7 +96,7 @@ class ProductProduct(orm.Model):
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
             
-            print record
+            print record # TODO remove
             # Mapping fields:
             data = {
                 'dbf_import': True,
