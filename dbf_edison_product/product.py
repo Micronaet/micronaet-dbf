@@ -71,7 +71,6 @@ class ProductProduct(orm.Model):
         
         i = 0
         producer_db = {}
-        import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
@@ -86,6 +85,7 @@ class ProductProduct(orm.Model):
             if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
                 continue
 
+            import pdb; pdb.set_trace()
             # Metel producer code information:
             metel_producer_code = '%s-' % metel_producer_code
             if metel_producer_code in producer_db:
