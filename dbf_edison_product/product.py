@@ -87,10 +87,10 @@ class ProductProduct(orm.Model):
             # Metel producer code information:
             metel_producer_code = '%s-' % metel_producer_code
             if metel_producer_code not in producer_db:
-                metel_producer_id = category_pool.get_create_producer_group(
-                    cr, uid, metel_producer_code, metel_producer_code,
-                    context=context)
-                producer_db.get[metel_producer_code] = metel_producer_id    
+                producer_db.get[metel_producer_code] = \
+                    category_pool.get_create_producer_group(
+                        cr, uid, metel_producer_code, metel_producer_code,
+                        context=context)
 
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
