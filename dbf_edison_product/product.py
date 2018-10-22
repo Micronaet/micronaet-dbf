@@ -80,20 +80,17 @@ class ProductProduct(orm.Model):
             # -----------------------------------------------------------------    
             metel_producer_code = record['CCODPROD']
             default_code = record['CCODARTI']
-            name = record['CDESARTI']
-
             if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
                 continue
+            name = record['CDESARTI']
 
-            import pdb; pdb.set_trace()
             # Metel producer code information:
             metel_producer_code = '%s-' % metel_producer_code
-            if metel_producer_code in producer_db:
-                metel_producer_id = producer_db.get[metel_producer_code]
-            else:
+            if metel_producer_code not in producer_db:
                 metel_producer_id = category_pool.get_create_producer_group(
                     cr, uid, metel_producer_code, metel_producer_code,
                     context=context)
+                producer_db.get[metel_producer_code] = metel_producer_id    
 
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
@@ -126,14 +123,13 @@ class ProductProduct(orm.Model):
                 
                 #'metel_electrocod':
                 'metel_producer_code': metel_producer_code,
-                'metel_producer_id': metel_producer_id,
+                'metel_producer_id': producer_db.get[metel_producer_code],
                 }
                 
             # Search product code:
-            continue # TODO remove
             product_ids = self.search(cr, uid, [
                 ('default_code', '=', default_code),
-                ('metel_producer_code', '=', False),
+                ('metel_producer_code', '=', metel_producer_code),
                 ], context=context)
             if len(product_ids) > 1:
                 log(
