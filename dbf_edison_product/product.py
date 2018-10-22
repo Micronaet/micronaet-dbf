@@ -123,7 +123,7 @@ class ProductProduct(orm.Model):
                 
                 #'metel_electrocod':
                 'metel_producer_code': metel_producer_code,
-                'metel_producer_id': producer_db.get[metel_producer_code],
+                'metel_producer_id': producer_db[metel_producer_code],
                 }
                 
             # Search product code:
