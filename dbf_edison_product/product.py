@@ -154,7 +154,7 @@ class ProductProduct(orm.Model):
             if product_ids:
                 self.write(cr, uid, product_ids, data, context=context)
             else:
-                self.create(cr, uid, data, context=context
+                self.create(cr, uid, data, context=context)
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
