@@ -83,6 +83,7 @@ class ProductProduct(orm.Model):
             if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
                 continue
             name = record['CDESARTI']
+            ean13 = record['CCODARPR']            
 
             # Metel producer code information:
             metel_producer_code = '%s-' % metel_producer_code
@@ -95,6 +96,7 @@ class ProductProduct(orm.Model):
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
             
+            print record
             # Mapping fields:
             data = {
                 'dbf_import': True,
@@ -102,7 +104,7 @@ class ProductProduct(orm.Model):
                 'name': name,
                 #'CCODFORN'
                 #'CCODPROD'
-                #'ean13': record['CCODARPR'],
+                'ean13': ean13,
                 #'CCODCLAS'
                 #'CCODCLA2'
                 # record['NPREZZO1'],
@@ -140,9 +142,25 @@ class ProductProduct(orm.Model):
                 product_ids = [product_ids[0]]
 
             if product_ids:
-                self.write(cr, uid, product_ids, data, context=context)
+                try:
+                    self.write(cr, uid, product_ids, data, context=context)
+                except:
+                    del(data['ean13'])   
+                    log(
+                        log_file, _('Error EAN number: %s') % ean13, 
+                        mode='ERROR',
+                        )
+                    self.write(cr, uid, product_ids, data, context=context)
             else:
-                self.create(cr, uid, data, context=context)
+                try:
+                    self.create(cr, uid, data, context=context)
+                except:
+                    del(data['ean13'])    
+                    log(
+                        log_file, _('Error EAN number: %s') % ean13, 
+                        mode='ERROR',
+                        )
+                    self.create(cr, uid, data, context=context)
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
