@@ -102,7 +102,7 @@ class ProductProduct(orm.Model):
                 'name': name,
                 #'CCODFORN'
                 #'CCODPROD'
-                'ean13': record['CCODARPR'],
+                #'ean13': record['CCODARPR'],
                 #'CCODCLAS'
                 #'CCODCLA2'
                 # record['NPREZZO1'],
