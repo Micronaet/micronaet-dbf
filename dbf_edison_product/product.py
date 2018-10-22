@@ -69,12 +69,39 @@ class ProductProduct(orm.Model):
         db_name = 'ARTICO.DBF'
         
         i = 0
+        artico = open(
+            '/opt/odoo/.local/share/Odoo/mount/edison/DATI/artico.csv', 'w') # XXX remove
+        #import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
-                    cr, uid, db_name, context=context):
+                cr, uid, db_name, context=context):
             metel_producer_code = record['CCODPROD']
             if len(metel_producer_code or '') >=3:
-                continue
+                # XXX continue
+                use = False
+            else:    
+                use = True
             i += 1
+
+            # -----------------------------------------------------------------
+            # XXX REMOVE:
+            line = '%s|%s|%s|%s\n' % (
+                'X' if use else '',
+                record['CCODARTI'],
+                record['CDESARTI'],
+                metel_producer_code,
+                )
+            res = ''
+            for c in line:
+                if ord(c) <= 127:
+                    res += c
+                else:
+                    res += '_'
+                    
+            artico.write(res)
+            continue
+            # XXX REMOVE:
+            # -----------------------------------------------------------------
+    
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
             
@@ -93,38 +120,17 @@ class ProductProduct(orm.Model):
                 # record['NPREZZO1'],
                 #'NPREZZO2' 'NPREZZO3' 'NPREZZO4' 'NPREZZOX' 
                 'lst_price': record['NPREZZOP'],
-                #'LARTPROD'
-                #'CPREZZO1'
+                #'LARTPROD' #'CPREZZO1'
                 #'CPREZZO2' 'CPREZZO3' 'CPREZZO4'
-                # PCE 'CCODUNMI'
-                # 22 'CCODCIVA'
-                #'NMINFORF'
-                #'NMINCALC'
-                #'NPREZZOM'
-                #'NMINFASA'
-                #'NMINFASB'
-                #'CPRSCONT'
-                #'CPREXTRA'
-                #'NQTACONF'
-                #'CSTATO'
-                #'NDISPO'
-                #'DDATUACQ'
-                #'NRAPCONV'
-                #'CORDFORN'
-                #'CCODCAVE'
-                #'CCODALTE'
-                #'CCODPREL'
-                #'NQTASCMI'
-                #'NQTASCMA'
-                #'NQTALORI'
+                # PCE 'CCODUNMI' # 22 'CCODCIVA'
+                #'NMINFORF' #'NMINCALC' #'NPREZZOM' #'NMINFASA' #'NMINFASB' 
+                #'CPRSCONT' #'CPREXTRA'
+                #'NQTACONF' #'CSTATO' #'NDISPO' #'DDATUACQ' #'NRAPCONV' 
+                #'CORDFORN' #'CCODCAVE'
+                #'CCODALTE' #'CCODPREL' #'NQTASCMI' #'NQTASCMA' #'NQTALORI' 
                 #'LFORNAB'
-                #'CCODSERI'
-                #'LARBSMAX'
-                #'CCODCLIE'
-                #'CMODELLO'
-                #'CSOTTOTI'
-                #'CCODLAVO'
-                #'CCODPREV'
+                #'CCODSERI' #'LARBSMAX' #'CCODCLIE' #'CMODELLO' #'CSOTTOTI' 
+                #'CCODLAVO' #'CCODPREV'
                 'description': record['MMEMO'],
                 
                 #'metel_electrocod':
@@ -132,6 +138,7 @@ class ProductProduct(orm.Model):
                 }
                 
             # Search product code:
+            continue # TODO remove
             product_ids = self.search(cr, uid, [
                 ('default_code', '=', default_code),
                 ('metel_producer_code', '=', False),
@@ -147,7 +154,7 @@ class ProductProduct(orm.Model):
             if product_ids:
                 self.write(cr, uid, product_ids, data, context=context)
             else:
-                self.create(cr, uid, data, context=context)                
+                self.create(cr, uid, data, context=context
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
