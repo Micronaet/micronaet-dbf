@@ -52,6 +52,7 @@ class AccountAnalyticAccount(orm.Model):
         ''' Import analytic from external DBF
         '''
         _logger.info('Start import account')    
+        log_info = True
 
         # Pool used:
         partner_pool = self.pool.get('res.partner')
@@ -120,6 +121,10 @@ class AccountAnalyticAccount(orm.Model):
                     _logger.error(
                         'Codice partner non trovato: %s Commessa %s' % (
                             partner_code, code))
+            if log_info:                            
+                log(log_file,
+                    'Commessa: %s Partner: %s' % (code, partner_code))
+
             # -----------------------------------------------------------------
             # Address partner (create):
             # -----------------------------------------------------------------
