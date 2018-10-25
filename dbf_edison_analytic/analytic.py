@@ -56,7 +56,7 @@ class AccountAnalyticAccount(orm.Model):
         # Pool used:
         partner_pool = self.pool.get('res.partner')
         company_pool = self.pool.get('res.company')
-
+        
         db = company_pool.get_dbf_table(
             cr, uid, 'CANTIE.DBF', context=context)
 
@@ -65,7 +65,8 @@ class AccountAnalyticAccount(orm.Model):
             cr, uid, log_name, context=context)
         log = company_pool.get_dbf_logevent
         log(log_file, 'Inizio importazione cantieri', mode='INFO')
-            
+        
+        partner_check = []    
         i = 0
         for record in db:
             i += 1
@@ -107,7 +108,18 @@ class AccountAnalyticAccount(orm.Model):
                     )
             if partner_ids:
                 partner_id = partner_ids[0]
-
+            else:
+                if partner_code not in partner_check:
+                    partner_check.append(partner_code)                
+                    log(
+                        log_file, 
+                        'Codice partner non trovato: %s' % partner_code, 
+                        mode='ERROR',
+                        )
+                else:
+                    _logger.error(
+                        'Codice partner non trovato: %s Commessa %s' % (
+                            partner_code, code))
             # -----------------------------------------------------------------
             # Address partner (create):
             # -----------------------------------------------------------------

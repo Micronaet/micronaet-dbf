@@ -102,16 +102,13 @@ class ProductProduct(orm.Model):
                 'dbf_import': True,
                 'default_code': default_code,
                 'name': name,
-                #'CCODFORN'
-                #'CCODPROD'
+                #'CCODFORN' #'CCODPROD'
                 'ean13': ean13,
-                #'CCODCLAS'
-                #'CCODCLA2'
+                #'CCODCLAS' #'CCODCLA2'
                 # record['NPREZZO1'],
                 #'NPREZZO2' 'NPREZZO3' 'NPREZZO4' 'NPREZZOX' 
                 'lst_price': record['NPREZZOP'],
-                #'LARTPROD' #'CPREZZO1'
-                #'CPREZZO2' 'CPREZZO3' 'CPREZZO4'
+                #'LARTPROD' #'CPREZZO1' #'CPREZZO2' 'CPREZZO3' 'CPREZZO4'
                 # PCE 'CCODUNMI' # 22 'CCODCIVA'
                 #'NMINFORF' #'NMINCALC' #'NPREZZOM' #'NMINFASA' #'NMINFASB' 
                 #'CPRSCONT' #'CPREXTRA'
