@@ -52,7 +52,7 @@ class AccountAnalyticAccount(orm.Model):
         ''' Import analytic from external DBF
         '''
         _logger.info('Start import account')    
-        log_info = True
+        log_info = False # TODO put in parameters?
 
         # Pool used:
         partner_pool = self.pool.get('res.partner')
