@@ -46,7 +46,7 @@ class ResPartner(orm.Model):
     
     _inherit = 'res.partner'
     
-    def schedule_dbf_edison_partner_mx_import(self, cr, uid, 
+    def schedule_dbf_edison_partner_import(self, cr, uid, 
             verbose_log_count=100, log_name='partner.log',
             context=None):
         ''' Import partner from external DBF
