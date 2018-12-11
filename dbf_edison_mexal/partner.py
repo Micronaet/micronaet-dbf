@@ -99,8 +99,8 @@ class ResPartner(orm.Model):
                     record[mapping['name2']] or '',
                     )
                 vat = record['CPARTIVA']
-                if vat and vat[:1].isdigit():
-                    vat = 'IT%s' % vat
+                #if vat and vat[:1].isdigit():
+                #    vat = 'IT%s' % vat
                 
                 row = mask % (
                     ref,
@@ -114,7 +114,7 @@ class ResPartner(orm.Model):
                     record['CINDIR'], # street
                     record['CCAP'], # zip
                     record['CCOMUNE'], # city
-                    record['CDPROV'], # prov.
+                    record['CPROV'], # prov.
 
                     '', #record['CDPROV'], # payment
                     record['CCODAGEN'], # agent code
