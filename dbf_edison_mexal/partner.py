@@ -87,7 +87,7 @@ class ResPartner(orm.Model):
             ]
         
         i = c = s = 0 # counters (total read, customer, supplier)
-        mask = '%-8s%-70s%-30s%-90s%-30s%-29s%-24s%-17s%-52s%-5s%-26s%-20s'
+        mask = '%-8s%-70s%-30s%-90s%-30s%-29s%-24s%-17s%-52s%-5s%-26s%-20s' + \
             '%-25s%-10s%-16s%-30s%-37s%s'
         
         for mode, db_name, mapping, csv_name in mapping_db:
@@ -147,7 +147,7 @@ class ResPartner(orm.Model):
                     #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
                     #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
                     eol,
-                    ))
+                    )
 
                 #clean row    
                 f_export.write(row)
