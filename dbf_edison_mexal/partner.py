@@ -59,10 +59,6 @@ class ResPartner(orm.Model):
         # Browse company: 
         company_pool = self.pool.get('res.company')
         
-        # Log:
-        log = company_pool.get_dbf_logevent
-        log(log_file, 'Inizio extract partner', mode='INFO')
-
         # ---------------------------------------------------------------------
         # Mapping:
         # ---------------------------------------------------------------------
