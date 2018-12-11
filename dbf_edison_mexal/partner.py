@@ -120,7 +120,7 @@ class ResPartner(orm.Model):
                     ref,
                     clean(name, 70),
                     record[mapping['phone']], # phone
-                    record['CEMAIL'], # email
+                    clean(record['CEMAIL'], 90), # email
                     '', # TODO fax
                     '', # TODO reference
                     vat, # vat
