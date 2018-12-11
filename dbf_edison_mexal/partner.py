@@ -157,6 +157,7 @@ class ResPartner(orm.Model):
                     )
 
                 #clean row    
+                print row
                 f_export.write(row)
             f_export.close()    
         return True        
