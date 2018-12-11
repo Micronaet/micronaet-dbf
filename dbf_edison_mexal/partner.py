@@ -51,6 +51,20 @@ class ResPartner(orm.Model):
             supplier='supplier.csv', context=None):
         ''' Import partner from external DBF
         '''
+        def clean(value, length=False):
+            if not value:
+                return ''
+                
+            res = ''
+            for c in value:
+                if ord(c) < 127:
+                    res += c
+                else:
+                    res += '#'
+            if length:
+                return res[:length]        
+            return res
+            
         # ---------------------------------------------------------------------
         #                      COMMON PART: Get parameter
         # ---------------------------------------------------------------------
@@ -104,7 +118,7 @@ class ResPartner(orm.Model):
                 
                 row = mask % (
                     ref,
-                    name[:70],
+                    clean(name, 70),
                     record[mapping['phone']], # phone
                     record['CEMAIL'], # email
                     '', # TODO fax
@@ -113,7 +127,7 @@ class ResPartner(orm.Model):
                     record['CCODFISC'], # fiscalcode
                     record['CINDIR'], # street
                     record['CCAP'], # zip
-                    record['CCOMUNE'], # city
+                    clean(record['CCOMUNE'], 26), # city
                     record['CPROV'], # prov.
 
                     '', #record['CDPROV'], # payment
