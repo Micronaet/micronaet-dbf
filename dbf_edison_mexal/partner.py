@@ -125,7 +125,7 @@ class ResPartner(orm.Model):
                     '', # TODO reference
                     vat, # vat
                     record['CCODFISC'], # fiscalcode
-                    record['CINDIR'], # street
+                    clean(record['CINDIR'], 52), # street
                     record['CCAP'], # zip
                     clean(record['CCOMUNE'], 26), # city
                     record['CPROV'], # prov.
