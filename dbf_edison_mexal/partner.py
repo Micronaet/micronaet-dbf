@@ -47,9 +47,8 @@ class ResPartner(orm.Model):
     _inherit = 'res.partner'
     
     def schedule_dbf_edison_partner_import(self, cr, uid, 
-            verbose_log_count=100, log_name='partner.log',
-            customer='customer.csv', supplier='supplier.csv',  
-            context=None):
+            verbose_log_count=100, customer='customer.csv', 
+            supplier='supplier.csv', context=None):
         ''' Import partner from external DBF
         '''
         # ---------------------------------------------------------------------
@@ -61,8 +60,6 @@ class ResPartner(orm.Model):
         company_pool = self.pool.get('res.company')
         
         # Log:
-        log_file = company_pool.get_dbf_logfile(
-            cr, uid, log_name, context=context)
         log = company_pool.get_dbf_logevent
         log(log_file, 'Inizio extract partner', mode='INFO')
 
