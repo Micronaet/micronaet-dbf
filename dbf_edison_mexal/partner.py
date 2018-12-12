@@ -71,9 +71,8 @@ class ResPartner(orm.Model):
                 if not item:
                     res.append('')
                 else:
-                    res.append(item)
+                    res.append('%s' % item)
                 print res
-                import pdb; pdb.set_trace()    
             return res
                     
         # ---------------------------------------------------------------------
