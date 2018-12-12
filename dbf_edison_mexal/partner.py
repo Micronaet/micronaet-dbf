@@ -56,7 +56,7 @@ class ResPartner(orm.Model):
                 return ''
                 
             res = ''
-            for c in value:
+            for c in '%s' % value:
                 if ord(c) < 127:
                     res += c
                 else:
