@@ -154,9 +154,9 @@ class ResPartner(orm.Model):
                     clean(record['CPARTIVA'], 24), # vat
                     clean(record['CCODFISC'], 17), # fiscalcode
                     clean(record['CINDIR'], 52), # street
-                    clean(record['CCAP'] 5), # zip
+                    clean(record['CCAP'], 5), # zip
                     clean(record['CCOMUNE'], 26), # city
-                    clean(record['CPROV'] 20), # prov.
+                    clean(record['CPROV'], 20), # prov.
 
                     clean(payment_db.get(
                         '', ''), 25) #record['CDPROV'], # payment
@@ -165,7 +165,7 @@ class ResPartner(orm.Model):
                     clean(record['CCODBANC'], 30), # cod. bank
                     clean(vat_db.get(
                         record['CCODIVA'], ''), 4), # IVA ID
-                    clean(record['CNAZIONE'] 2), # Country
+                    clean(record['CNAZIONE'], 2), # Country
                     clean(record['CCONTCORR'], 20), # CC
                     clean(record['CSITOWEB'], 80), # Web
                     clean(record['NSPESEIN'], 6), # Expense
