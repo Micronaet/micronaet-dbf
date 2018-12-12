@@ -65,6 +65,15 @@ class ResPartner(orm.Model):
                 return res[:length]        
             return res
         
+        def clean_excel_line(record):
+            res = []
+            for item in record.values():
+                if not item:
+                    res.append('')
+                else:
+                    res.append(item)
+            return res
+                    
         # ---------------------------------------------------------------------
         #                      COMMON PART: Get parameter
         # ---------------------------------------------------------------------
@@ -120,7 +129,8 @@ class ResPartner(orm.Model):
                         ws_name, row, record.keys())
                     row += 1
                 # Write line:
-                excel_pool.write_xls_line(ws_name, row, record.values())
+                excel_pool.write_xls_line(
+                    ws_name, row, clean_excel_line(record))
                 row += 1
                 
                     
