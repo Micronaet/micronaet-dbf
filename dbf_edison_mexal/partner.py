@@ -164,7 +164,7 @@ class ResPartner(orm.Model):
                     clean('', 16), #record['NSCOFATT'], # discount
                     clean(record['CCODBANC'], 30), # cod. bank
                     clean(vat_db.get(
-                        record['CCODIVA'], ''), 4), # IVA ID
+                        record['CCODCIVA'], ''), 4), # IVA ID
                     clean(record['CNAZIONE'], 2), # Country
                     clean(record['CCONTCORR'], 20), # CC
                     clean(record['CSITOWEB'], 80), # Web
