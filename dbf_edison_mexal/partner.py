@@ -182,6 +182,8 @@ class ResPartner(orm.Model):
                     expense = record['NSPESEIN']
                 except: 
                     expense = ''    
+                
+                payment = record['CCODCOPA']
                     
                 row = mask % (
                     clean(ref, 8),
@@ -197,8 +199,7 @@ class ResPartner(orm.Model):
                     clean(record['CCOMUNE'], 26), # city
                     clean(record['CPROV'], 20), # prov.
 
-                    clean(payment_db.get(
-                        'CCODCOPA', ''), 25), #record['CDPROV'], # payment
+                    clean(payment, 25), # payment
                     clean(record['CCODAGEN'], 10), # agent code
                     clean('', 16), #record['NSCOFATT'], # discount
                     clean(record['CCODBANC'], 30), # cod. bank
