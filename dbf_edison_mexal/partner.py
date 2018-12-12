@@ -88,21 +88,21 @@ class ResPartner(orm.Model):
                 'ref': 'CCODCLIE',
                 'name1': 'CDESCLIE',
                 'name2': 'CDE2CLIE',
-                'phone': 'CTEACLIE',
-                'mobile': 'CTECCLIE',                
+                'phone': 'CTEUCLIE',
+                'mobile': 'CTEACLIE',                
                 }, customer),
             ('supplier', 'TBFORN.DBF', {
                 'ref': 'CCODFORN',
                 'name1': 'CDESFORN',
                 'name2': 'CDE2FORN',
-                'phone': 'CTEAFORN',
-                'mobile': 'CTECFORN',
+                'phone': 'CTEUFORN',
+                'mobile': 'CTEAFORN',
                 }, supplier),
             ]
         
         i = c = s = 0 # counters (total read, customer, supplier)
         mask = '%-8s%-70s%-30s%-90s%-30s%-29s%-24s%-17s%-52s%-5s%-26s%-20s' + \
-            '%-25s%-10s%-16s%-30s%-37s%s'
+            '%-25s%-10s%-16s%-30s%-4s%-2s%-20s%-80s%-6s%-1s%-2s%s'
 
         for mode, db_name, mapping, csv_name in mapping_db:
             db = company_pool.get_dbf_table(
@@ -136,34 +136,34 @@ class ResPartner(orm.Model):
                     record[mapping['name1']] or '',
                     record[mapping['name2']] or '',
                     )
-                vat = record['CPARTIVA']
-                #if vat and vat[:1].isdigit():
-                #    vat = 'IT%s' % vat
-                
-                row = mask % (
-                    ref,
-                    clean(name, 70),
-                    record[mapping['phone']], # phone
-                    clean(record['CEMAIL'], 90), # email
-                    '', # TODO fax
-                    '', # TODO reference
-                    vat, # vat
-                    record['CCODFISC'], # fiscalcode
-                    clean(record['CINDIR'], 52), # street
-                    record['CCAP'], # zip
-                    clean(record['CCOMUNE'], 26), # city
-                    record['CPROV'], # prov.
 
-                    '', #record['CDPROV'], # payment
-                    record['CCODAGEN'], # agent code
-                    '', #record['NSCOFATT'], # discount
-                    record['CCODBANC'], # cod. bank
-                    '', #record['CDPROV'], # IBAN
+                row = mask % (
+                    clean(ref, 8),
+                    clean(name, 70),
+                    clean(record[mapping['phone']], 30), # phone
+                    clean(record['CEMAIL'], 90), # email
+                    clean('', 30), # TODO fax
+                    clean('CRIFERIM', 29), # TODO reference
+                    clean(record['CPARTIVA'], 24), # vat
+                    clean(record['CCODFISC'] 17), # fiscalcode
+                    clean(record['CINDIR'], 52), # street
+                    clean(record['CCAP'] 5), # zip
+                    clean(record['CCOMUNE'], 26), # city
+                    clean(record['CPROV'] 20), # prov.
+
+                    clean('', 25) #record['CDPROV'], # payment
+                    clean(record['CCODAGEN'], 10), # agent code
+                    clean('', 16), #record['NSCOFATT'], # discount
+                    clean(record['CCODBANC'], 30), # cod. bank
+                    clean(record['CCODIVA'], 4), # IVA ID
+                    clean(record['CNAZIONE'] 2), # Country
+                    clean(record['CCONTCORR'], 20), # CC
+                    clean(record['CSITOWEB'], 80), # Web
+                    clean(record['NSPESEIN'], 6), # Expense
+                    clean(record['CCODCINN'], 1), # Cinn
+                    clean(record['CCODCINE'], 2), # Cine
                     eol,
                     )
-
-                #clean row    
-                print row
                 f_export.write(row)
             f_export.close()    
         excel_filename = os.path.expanduser('~/partner.xlsx')    
