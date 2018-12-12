@@ -111,7 +111,8 @@ class ResPartner(orm.Model):
             f_export = open(csv_name, 'w')    
 
             row = 0
-            excel_pool.create_worksheet(mode)
+            ws_name = mode
+            excel_pool.create_worksheet(ws_name)
             for record in db:
                 # -------------------------------------------------------------
                 # Excel extract
