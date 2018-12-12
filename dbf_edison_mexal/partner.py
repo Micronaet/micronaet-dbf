@@ -143,7 +143,10 @@ class ResPartner(orm.Model):
                     record[mapping['name1']] or '',
                     record[mapping['name2']] or '',
                     )
-
+                try:    
+                    expense = record['NSPESEIN']
+                except: 
+                    expense = ''    
                 row = mask % (
                     clean(ref, 8),
                     clean(name, 70),
@@ -168,7 +171,7 @@ class ResPartner(orm.Model):
                     clean(record['CNAZIONE'], 2), # Country
                     clean(record['CCONTCORR'], 20), # CC
                     clean(record['CSITOWEB'], 80), # Web
-                    clean(record['NSPESEIN'], 6), # Expense
+                    clean(expense, 6), # Expense
                     clean(record['CCODCINN'], 1), # Cinn
                     clean(record['CCODCINE'], 2), # Cine
                     eol,
