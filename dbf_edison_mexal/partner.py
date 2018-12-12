@@ -152,7 +152,7 @@ class ResPartner(orm.Model):
                     clean('', 30), # TODO fax
                     clean('CRIFERIM', 29), # TODO reference
                     clean(record['CPARTIVA'], 24), # vat
-                    clean(record['CCODFISC'] 17), # fiscalcode
+                    clean(record['CCODFISC'], 17), # fiscalcode
                     clean(record['CINDIR'], 52), # street
                     clean(record['CCAP'] 5), # zip
                     clean(record['CCOMUNE'], 26), # city
