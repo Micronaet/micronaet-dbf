@@ -69,10 +69,10 @@ class ResPartner(orm.Model):
             res = []
             for item in record.values():
                 if not item:
-                    res.append('')
+                    res.append(u'')
                 else:
-                    res.append('%s' % item)
-                print res
+                    res.append(u'%s' % item)
+            print res        
             return res
                     
         # ---------------------------------------------------------------------
@@ -172,24 +172,6 @@ class ResPartner(orm.Model):
                     '', #record['NSCOFATT'], # discount
                     record['CCODBANC'], # cod. bank
                     '', #record['CDPROV'], # IBAN
-                                        
-                    
-                    #'mobile': record[mapping['mobile']], # mobile
-                    #'website': record['CSITOWEB'], # website                    
-                    #CFASCIA CCODCOPA CCODCIVA CDESDESCR 
-                    #CDESINDIR CDESCITTA 2CTEUCLIE CTELRIF CMESIMAN NCOSTMAN 
-                    #DDATAMAN CTIPCLIE CCODZONA CTLIARSE CTLIARCO CNAZIONE
-                    #LFLAGCEE NSCONTEX CCODVETT CCODVALU
-                    #CCODLIST CCONTORI CSTATO
-                    #CCONTCORR NSPESEIN NSPEBOLL NSPETRAS CNUMDIC
-                    #DDATDIC CNUMREG DDATREG LEFFRATE CFILLER
-                    #NQUALIFI DDATINSE CRIFERIM CCORTATT LSPESEIN
-                    #LSPEBOLL LNOEXPCO NSPEFISS CCODCINN CCODCINE
-                    # NSCOARFA NSTSINCR DDATOPER CORAOPER
-                    #CCODOPER CCODUTEN NRICMANO NRICSPEX LPERSONA
-                    #CFILLER1 CTEC2CLI CTELRIF2 CCODAMMI CCODPORT
-                    #CTIPSOGG NQUALIF2 3NQUALIF3 LCALCRIT LFRZPRZV
-                    #LFRZNPRZ CEMAIL2 CPEC MZONA MNOTE
                     eol,
                     )
 
