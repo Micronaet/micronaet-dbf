@@ -64,7 +64,7 @@ class ResPartner(orm.Model):
             if length:
                 return res[:length]        
             return res
-            
+        
         # ---------------------------------------------------------------------
         #                      COMMON PART: Get parameter
         # ---------------------------------------------------------------------
@@ -115,11 +115,12 @@ class ResPartner(orm.Model):
                 # -------------------------------------------------------------
                 # Write header:
                 import pdb; pdb.set_trace()
-                if not row:
-                    excel_pool.write_xls_line(ws_name, row, record.keys())
+                if not row:                    
+                    excel_pool.write_xls_line(
+                        ws_name, row, record.keys())
                     row += 1
                 # Write line:
-                excel_pool.write_xls_line(ws_name, row, record)
+                excel_pool.write_xls_line(ws_name, row, record.values())
                 row += 1
                 
                     
@@ -183,6 +184,6 @@ class ResPartner(orm.Model):
                 f_export.write(row)
             f_export.close()    
         excel_filename = os.path.expanduser('~/partner.xlsx')    
-        excel_pool.save_file_as('')
+        excel_pool.save_file_as(excel_filename)
         return True        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
