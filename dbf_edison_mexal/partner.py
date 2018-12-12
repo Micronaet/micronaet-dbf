@@ -110,7 +110,7 @@ class ResPartner(orm.Model):
                 cr, uid, db_name, context=context)
             f_export = open(csv_name, 'w')    
 
-            row = 0
+            excel_row = 0
             ws_name = mode
             excel_pool.create_worksheet(ws_name)
             for record in db:
@@ -118,14 +118,14 @@ class ResPartner(orm.Model):
                 # Excel extract
                 # -------------------------------------------------------------
                 # Write header:
-                if not row:                    
+                if not excel_row:                    
                     excel_pool.write_xls_line(
-                        ws_name, row, record.keys())
-                    row += 1
+                        ws_name, excel_row, record.keys())
+                    excel_row += 1
                 # Write line:                
                 excel_pool.write_xls_line(
-                    ws_name, row, clean_excel_line(record))
-                row += 1
+                    ws_name, excel_row, clean_excel_line(record))
+                excel_row += 1
                     
                 i += 1
                 if verbose_log_count and i % verbose_log_count == 0:
