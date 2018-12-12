@@ -72,6 +72,13 @@ class ResPartner(orm.Model):
         
         # Browse company: 
         company_pool = self.pool.get('res.company')
+        excel_pool = self.pool.get('excel.writer')
+
+        # ---------------------------------------------------------------------
+        # Excel export all:
+        # ---------------------------------------------------------------------
+        ws_name = 'Partner'
+        excel_pool.create_worksheet(ws_name)
         
         # ---------------------------------------------------------------------
         # Mapping:
@@ -97,12 +104,27 @@ class ResPartner(orm.Model):
         mask = '%-8s%-70s%-30s%-90s%-30s%-29s%-24s%-17s%-52s%-5s%-26s%-20s' + \
             '%-25s%-10s%-16s%-30s%-37s%s'
 
+        row = 0
         for mode, db_name, mapping, csv_name in mapping_db:
             db = company_pool.get_dbf_table(
                 cr, uid, db_name, context=context)
             f_export = open(csv_name, 'w')    
             for record in db:
+                # -------------------------------------------------------------
+                # Excel extract
+                # -------------------------------------------------------------
+                # Write header:
+                import pdb; pdb.set_trace()
+                if not row:
+                    excel_pool.write_xls_line(ws_name, row, record.keys())
+                    row += 1
+                # Write line:
+                excel_pool.write_xls_line(ws_name, row, record)
+                row += 1
+                
+                    
                 i += 1
+                
                 if verbose_log_count and i % verbose_log_count == 0:
                     _logger.info('Extract customer #: %s' % i)
                 
@@ -160,5 +182,7 @@ class ResPartner(orm.Model):
                 print row
                 f_export.write(row)
             f_export.close()    
+        excel_filename = os.path.expanduser('~/partner.xlsx')    
+        excel_pool.save_file_as('')
         return True        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
