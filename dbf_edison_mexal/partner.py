@@ -68,10 +68,7 @@ class ResPartner(orm.Model):
         def clean_excel_line(record):
             res = []
             for item in record.values():
-                if not item:
-                    res.append(u'')
-                else:
-                    res.append(u'%s' % item)
+                res.append(u'%s' % (item or ''))
             print res        
             return res
                     
@@ -124,7 +121,6 @@ class ResPartner(orm.Model):
                 # Excel extract
                 # -------------------------------------------------------------
                 # Write header:
-                import pdb; pdb.set_trace()
                 if not row:                    
                     excel_pool.write_xls_line(
                         ws_name, row, record.keys())
