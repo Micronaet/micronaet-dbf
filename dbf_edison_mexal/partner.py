@@ -72,6 +72,8 @@ class ResPartner(orm.Model):
                     res.append('')
                 else:
                     res.append(item)
+                print res
+                import pdb; pdb.set_trace()    
             return res
                     
         # ---------------------------------------------------------------------
