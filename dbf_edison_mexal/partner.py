@@ -76,6 +76,13 @@ class ResPartner(orm.Model):
         # ---------------------------------------------------------------------
         eol = '\n\r'
         
+        payment_db = {
+            }
+        vat_db = {
+            #'21': '20',
+            #'23': 
+            }
+        
         # Browse company: 
         company_pool = self.pool.get('res.company')
         excel_pool = self.pool.get('excel.writer')
@@ -151,11 +158,13 @@ class ResPartner(orm.Model):
                     clean(record['CCOMUNE'], 26), # city
                     clean(record['CPROV'] 20), # prov.
 
-                    clean('', 25) #record['CDPROV'], # payment
+                    clean(payment_db.get(
+                        '', ''), 25) #record['CDPROV'], # payment
                     clean(record['CCODAGEN'], 10), # agent code
                     clean('', 16), #record['NSCOFATT'], # discount
                     clean(record['CCODBANC'], 30), # cod. bank
-                    clean(record['CCODIVA'], 4), # IVA ID
+                    clean(vat_db.get(
+                        record['CCODIVA'], ''), 4), # IVA ID
                     clean(record['CNAZIONE'] 2), # Country
                     clean(record['CCONTCORR'], 20), # CC
                     clean(record['CSITOWEB'], 80), # Web
