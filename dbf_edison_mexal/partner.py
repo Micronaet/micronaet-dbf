@@ -130,8 +130,11 @@ class ResPartner(orm.Model):
                         ws_name, row, record.keys())
                     row += 1
                 # Write line:
-                excel_pool.write_xls_line(
-                    ws_name, row, clean_excel_line(record))
+                try:
+                    excel_pool.write_xls_line(
+                        ws_name, row, clean_excel_line(record))
+                except:
+                    import pdb; pdb.set_trace()        
                 row += 1
                 
                     
