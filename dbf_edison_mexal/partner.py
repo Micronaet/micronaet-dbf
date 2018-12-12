@@ -159,7 +159,7 @@ class ResPartner(orm.Model):
                     clean(record['CPROV'], 20), # prov.
 
                     clean(payment_db.get(
-                        '', ''), 25) #record['CDPROV'], # payment
+                        '', ''), 25), #record['CDPROV'], # payment
                     clean(record['CCODAGEN'], 10), # agent code
                     clean('', 16), #record['NSCOFATT'], # discount
                     clean(record['CCODBANC'], 30), # cod. bank
