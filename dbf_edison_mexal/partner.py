@@ -69,7 +69,6 @@ class ResPartner(orm.Model):
             res = []
             for item in record.values():
                 res.append(u'%s' % (item or ''))
-            print res        
             return res
                     
         # ---------------------------------------------------------------------
