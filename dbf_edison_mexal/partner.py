@@ -77,10 +77,45 @@ class ResPartner(orm.Model):
         eol = '\n\r'
         
         payment_db = {
-            }
-        vat_db = {
-            #'21': '20',
-            #'23': 
+            '1': '1',
+            '2': '2',
+            '3': '9',
+            '4': '15',
+            '5': '16',
+            '6': '17',
+            '7': '22',
+            '8': '11',
+            '9': '25',
+            '10': '8',
+            '11': '7',
+            '12': '3',
+            '14': '13',
+            '15': '12',
+            '17': '23',
+            '20': '10',
+            '22': '31',
+            '23': '27',
+            '24': '5',
+            '26': '19',
+            '27': '18',
+            '28': '26',
+            '29': '30',
+            '32': '6',
+            '33': '24',
+            '35': '32',
+            '36': '29',
+            '37': '21',
+            '39': '20',
+            '13': '',
+            '16': '',
+            '18': '',
+            '19': '',
+            '21': '',
+            '25': '',
+            '30': '',
+            '31': '',
+            '34': '',
+            '38': '',
             }
         
         # Browse company: 
@@ -147,6 +182,7 @@ class ResPartner(orm.Model):
                     expense = record['NSPESEIN']
                 except: 
                     expense = ''    
+                    
                 row = mask % (
                     clean(ref, 8),
                     clean(name, 70),
@@ -162,12 +198,13 @@ class ResPartner(orm.Model):
                     clean(record['CPROV'], 20), # prov.
 
                     clean(payment_db.get(
-                        '', ''), 25), #record['CDPROV'], # payment
+                        'CCODCOPA', ''), 25), #record['CDPROV'], # payment
                     clean(record['CCODAGEN'], 10), # agent code
                     clean('', 16), #record['NSCOFATT'], # discount
                     clean(record['CCODBANC'], 30), # cod. bank
-                    clean(vat_db.get(
-                        record['CCODCIVA'], ''), 4), # IVA ID
+                    '22', 
+                    #clean(vat_db.get(
+                    #    record['CCODCIVA'], ''), 4), # IVA ID
                     clean(record['CNAZIONE'], 2), # Country
                     clean(record['CCONTCORR'], 20), # CC
                     clean(record['CSITOWEB'], 80), # Web
