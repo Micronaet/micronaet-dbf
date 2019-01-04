@@ -141,7 +141,7 @@ class DbfStockMove(orm.Model):
         history_db = {
             'cause': {},
             'product': {},
-            'analytic': {},
+            'account': {},
             'supplier': {},
             'customer': {},
             'picking': {},         
