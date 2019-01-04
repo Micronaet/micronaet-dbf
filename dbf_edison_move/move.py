@@ -121,7 +121,7 @@ class DbfStockMove(orm.Model):
         company_pool = self.pool.get('res.company')
         cause_pool = self.pool.get('dbf.stock.cause')
         product_pool = self.pool.get('product.product')
-        analytic_pool = self.pool.get('account.analytic.account')
+        account_pool = self.pool.get('account.analytic.account')
         partner_pool = self.pool.get('res.partner')
         picking_pool = self.pool.get('dbf.stock.picking')
         
