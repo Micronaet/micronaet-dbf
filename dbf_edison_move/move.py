@@ -97,7 +97,7 @@ class DbfStockMove(orm.Model):
         'cause_name': fields.char('Cause code', size=6),
         'metel_code': fields.char('Metel code', size=6),
         'account_name': fields.char('Account name', size=6),
-        'picking_name': fields.char('Account name', size=6),
+        'picking_name': fields.char('Picking name', size=6),
 
         # Mode data:
         'document_date': fields.date('Document date'),
@@ -143,7 +143,7 @@ class DbfStockMove(orm.Model):
             'product': {},
             'analytic': {},
             'supplier': {},
-            'partner': {},
+            'customer': {},
             'picking': {},         
             }
 
@@ -160,7 +160,7 @@ class DbfStockMove(orm.Model):
             # Field:
             # -----------------------------------------------------------------    
             document_date = record['DDATDOCU'] #, datetime.date(2007, 9, 7)), 
-            default_code = record['CCODARTI'] #, u'3FF11746'), 
+            product_code = record['CCODARTI'] #, u'3FF11746'), 
             supplier_code = record['CCODFORN'] #, u'000001'), 
             picking_name = record['CRIFDOCU'] #, u'882909'), 
             cause_name = record['CCODCATR'] #, u'10'), 
@@ -171,21 +171,89 @@ class DbfStockMove(orm.Model):
             supplier_code_2 = record['CCODFOR2'] #, u'000761'), 
             account_name = record['CCODCANT']
             note = record['MMEMO']
+            customer_code = False # TODO customer code
             
             # -----------------------------------------------------------------
             # Check foreing elements:    
             # -----------------------------------------------------------------
-            # TODO Product reference:
-            product_id = False
+            # Product reference:
+            if product_code and product_code not in history_db['account']:
+                product_ids = product_pool.search(cr, uid, [
+                    ('default_code', '=', product_code),
+                    ], context=context)
+                if product_ids:
+                    history_db['product'][product_code] = product_ids[0]
+                else:
+                    # No create!
+                    log(
+                        log_file, 
+                        _('Product code not found: %s') % product_code, 
+                        mode='ERROR',
+                        )
+            product_id = history_db['product'].get(product_code, False)
 
-            # TODO Supplier reference:
-            supplier_id = False
+            # Cause reference:
+            if cause_name and cause_name not in history_db['cause']:
+                cause_ids = cause_pool.search(cr, uid, [
+                    ('code', '=', cause_name),
+                    ], context=context)
+                if cause_ids:
+                    history_db['cause'][cause_name] = cause_ids[0]
+                else:
+                    history_db['cause'][cause_name] = cause_pool.create(
+                        cr, uid, {
+                            'code': cause_name,
+                            'name': cause_name,
+                            }, context=context)
+            cause_id = history_db['cause'].get(cause_name, False)
 
-            # TODO Partner reference:
-            partner_id = False
+            # Supplier reference:
+            if supplier_code and supplier_code not in history_db['account']:
+                partner_ids = partner_pool.search(cr, uid, [
+                    ('dbf_supplier_code', '=', supplier_code),
+                    ], context=context)
+                if partner_ids:
+                    history_db['supplier'][supplier_code] = partner_ids[0]
+                else:
+                    # No create!
+                    log(
+                        log_file, 
+                        _('Supplier code not found: %s') % supplier_code, 
+                        mode='ERROR',
+                        )
+            supplier_id = history_db['supplier'].get(supplier_code, False)
 
-            # TODO Account reference:
-            account_id = False
+            # Partner reference:
+            if customer_code and customer_code not in history_db['customer']:
+                customer_ids = partner_pool.search(cr, uid, [
+                    ('dbf_customer_code', '=', customer_code),
+                    ], context=context)
+                if customer_ids:
+                    history_db['customer'][customer_code] = customer_ids[0]
+                else:
+                    # No create!
+                    log(
+                        log_file, 
+                        _('Customer code not found: %s') % customer_code, 
+                        mode='ERROR',
+                        )
+            customer_id = history_db['customer'].get(customer_code, False)
+
+            # Account reference:
+            if account_name and account_name not in history_db['account']:
+                account_ids = account_pool.search(cr, uid, [
+                    ('code', '=', account_name),
+                    ], context=context)
+                if account_ids:
+                    history_db['account'][account_name] = account_ids[0]
+                else:
+                    # No create!
+                    log(
+                        log_file, 
+                        _('Account not found: %s') % account_name, 
+                        mode='ERROR',
+                        )
+            account_id = history_db['account'].get(account_name, False)
 
             # TODO If picking_name: create picking document:
             picking_id = False
@@ -193,15 +261,6 @@ class DbfStockMove(orm.Model):
                 #if (supplier_code, picking_code) 
                 # TODO picking_id
                 pass
-                
-            # TODO Cause reference:
-            if cause_name and cause_name not in history_db['cause']:
-                history_db['cause'][cause_name] = cause_pool.create(cr, uid, {
-                    'code': cause_name,
-                    'name': cause_name,
-                    }, context=context)
-            cause_id = history_db['cause'].get(cause_name, False)
-            
                 
             # -----------------------------------------------------------------
             # Primary record:
@@ -211,7 +270,7 @@ class DbfStockMove(orm.Model):
                 'cause_id': cause_id,
                 'product_id': product_id,
                 'supplier_id': supplier_id,
-                'partner_id': partner_id,
+                'partner_id': customer_id,
                 'account_id': account_id,
                 'picking_id': picking_id,
                 
