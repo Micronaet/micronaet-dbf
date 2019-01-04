@@ -139,6 +139,7 @@ class DbfStockMove(orm.Model):
         i = 0
         # Error database:
         history_db = {
+            'cause': {},
             'product': {},
             'analytic': {},
             'supplier': {},
