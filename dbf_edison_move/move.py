@@ -97,7 +97,7 @@ class DbfStockMove(orm.Model):
         'cause_name': fields.char('Cause code', size=6),
         'metel_code': fields.char('Metel code', size=6),
         'account_name': fields.char('Account name', size=6),
-        'pickin_name': fields.char('Account name', size=6),
+        'picking_name': fields.char('Account name', size=6),
 
         # Mode data:
         'document_date': fields.date('Document date'),
@@ -166,7 +166,7 @@ class DbfStockMove(orm.Model):
             cause_name = record['CCODCATR'] #, u'10'), 
             uom = record['CCODUNMI'] #, u'NR'), 
             product_qty = record['NQTAARTI'] #, 2.0), 
-            pricelist = record['NPREZZO'] #, 0.0), 
+            listprice = record['NPREZZO'] #, 0.0), 
             standard_price = record['NPREZZOCS'] #, 66.38), 
             supplier_code_2 = record['CCODFOR2'] #, u'000761'), 
             account_name = record['CCODCANT']
@@ -222,7 +222,7 @@ class DbfStockMove(orm.Model):
                 'cause_name': cause_name,
                 'uom': uom,
                 'product_qty': product_qty,
-                'pricelist': pricelist,
+                'listprice': listprice,
                 'standard_price': standard_price,
                 #'supplier_code_2': supplier_code_2,
                 'account_name': account_name,
