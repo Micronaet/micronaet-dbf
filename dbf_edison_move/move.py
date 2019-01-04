@@ -275,7 +275,7 @@ class DbfStockMove(orm.Model):
                 'picking_id': picking_id,
                 
                 'document_date': document_date,
-                'metel_code': default_code,
+                'metel_code': product_code,
                 'supplier_code': supplier_code,
                 'picking_name': picking_name,
                 'cause_name': cause_name,
