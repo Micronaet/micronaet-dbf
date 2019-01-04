@@ -161,7 +161,7 @@ class DbfStockMove(orm.Model):
 
             # -----------------------------------------------------------------    
             # Parse used fields:
-            # -----------------------------------------------------------------    
+            # -----------------------------------------------------------------                
             document_date = record['DDATDOCU'] #, datetime.date(2007, 9, 7)), 
             product_code = record['CCODARTI'] #, u'3FF11746'), 
             supplier_code = record['CCODFORN'] #, u'000001'), 
@@ -175,6 +175,8 @@ class DbfStockMove(orm.Model):
             account_name = record['CCODCANT']
             note = record['MMEMO']
             customer_code = False # TODO customer code
+            
+            error = False
             
             # -----------------------------------------------------------------
             #                      CHECK FOREIGN KEYS:
@@ -254,7 +256,9 @@ class DbfStockMove(orm.Model):
                         mode='ERROR',
                         )
             customer_id = history_db['customer'].get(customer_code, False)
-
+            if not error and customer_code and not customer_id:
+                error = True
+                
             # -----------------------------------------------------------------
             # Account reference:
             # -----------------------------------------------------------------
@@ -272,6 +276,8 @@ class DbfStockMove(orm.Model):
                         mode='ERROR',
                         )
             account_id = history_db['account'].get(account_name, False)
+            if not error and account_name and not account_id:
+                error = True
 
             # -----------------------------------------------------------------
             # TODO If picking_name: create picking document:
@@ -281,11 +287,15 @@ class DbfStockMove(orm.Model):
                 #if (supplier_code, picking_code) 
                 # TODO picking_id
                 pass
+            if not error and picking_name and not picking_id:
+                error = True
                 
             # -----------------------------------------------------------------
             # Primary record:
             # -----------------------------------------------------------------
             data = {
+                'error': error,
+                
                 # Foreign reference:
                 'cause_id': cause_id,
                 'product_id': product_id,
