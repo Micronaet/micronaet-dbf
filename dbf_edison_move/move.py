@@ -74,8 +74,7 @@ class DbfStockMove(orm.Model):
     
     _name = 'dbf.stock.move'
     _description = 'DBF Stock Move'
-    _rec_name = 'name'
-    _order = 'name'
+    _rec_name = 'product_id'
     
     _columns = {
         # Foreign keys:
@@ -124,7 +123,7 @@ class DbfStockMove(orm.Model):
         # Mapping:
         # ---------------------------------------------------------------------
         db_name = 'TBDEBO.DBF'
-        
+
         i = 0
         history_db = {
             'product': {},

@@ -1,0 +1,5 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_dbf_stock_cause_user,dbf.stock.cause,model_dbf_stock_cause,base.group_user,1,1,1,1
+access_dbf_stock_picking_user,dbf.stock.picking,model_dbf_stock_picking,base.group_user,1,1,1,1
+access_dbf_stock_move_user,dbf.stock.move,model_dbf_stock_move,base.group_user,1,1,1,1
+
