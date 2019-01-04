@@ -66,6 +66,8 @@ class DbfStockPicking(orm.Model):
         'name': fields.char('Name', size=64, required=True),
         'document_date': fields.date('Document date'),
         'insert_date': fields.date('Insert date'),
+        'partner_id': fields.many2one(
+            'res.partner', 'Supplier'),
         }
 
 class DbfStockMove(orm.Model):
@@ -90,11 +92,21 @@ class DbfStockMove(orm.Model):
             'res.partner', 'Partner'),
         'picking_id': fields.many2one(
             'dbf.stock.picking', 'Picking'),
-        
+
+        # Foreing name (used to create external ID):
+        'cause_name': fields.char('Cause code', size=6),
+        'metel_code': fields.char('Metel code', size=6),
+        'account_name': fields.char('Account name', size=6),
+        'pickin_name': fields.char('Account name', size=6),
+
         # Mode data:
+        'document_date': fields.date('Document date'),
         'product_qty': fields.float('Qty', digits=(16, 2)),
         'standard_price': fields.float('Price', digits=(16, 2)),
-        'uom': fields.char('UOM', size=6),        
+        'listprice': fields.float('List Price', digits=(16, 2)),
+        'supplier_code': fields.char('Supplier code', size=6),
+        'uom': fields.char('UOM', size=6),
+        'note': fields.text('Note'),
         }
 
     def schedule_dbf_edison_move_import(self, cr, uid, 
@@ -125,6 +137,7 @@ class DbfStockMove(orm.Model):
         db_name = 'TBDEBO.DBF'
 
         i = 0
+        # Error database:
         history_db = {
             'product': {},
             'analytic': {},
@@ -133,17 +146,134 @@ class DbfStockMove(orm.Model):
             'picking': {},         
             }
 
+        # Clean all previous database:
+        _logger.info('Delete all movement:')
+        cr.execute('DELETE from dbf_stock_move;')
+        
         # TODO manage last price update   
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
-            import pdb; pdb.set_trace()
+
             # -----------------------------------------------------------------    
             # Field:
             # -----------------------------------------------------------------    
-            '''metel_producer_code = record['CCODPROD']
-            default_code = record['CCODARTI']
+            document_date = record['DDATDOCU'] #, datetime.date(2007, 9, 7)), 
+            default_code = record['CCODARTI'] #, u'3FF11746'), 
+            supplier_code = record['CCODFORN'] #, u'000001'), 
+            picking_name = record['CRIFDOCU'] #, u'882909'), 
+            cause_name = record['CCODCATR'] #, u'10'), 
+            uom = record['CCODUNMI'] #, u'NR'), 
+            product_qty = record['NQTAARTI'] #, 2.0), 
+            pricelist = record['NPREZZO'] #, 0.0), 
+            standard_price = record['NPREZZOCS'] #, 66.38), 
+            supplier_code_2 = record['CCODFOR2'] #, u'000761'), 
+            account_name = record['CCODCANT']
+            note = record['MMEMO']
+            
+            # -----------------------------------------------------------------
+            # Check foreing elements:    
+            # -----------------------------------------------------------------
+            # TODO Product reference:
+            product_id = False
 
+            # TODO Supplier reference:
+            supplier_id = False
+
+            # TODO Partner reference:
+            partner_id = False
+
+            # TODO Account reference:
+            account_id = False
+
+            # TODO If picking_name: create picking document:
+            picking_id = False
+            if picking_code:
+                #if (supplier_code, picking_code) 
+                # TODO picking_id
+                pass
+                
+            # TODO Cause reference:
+            if cause_name and cause_name not in history_db['cause']:
+                history_db['cause'][cause_name] = cause_pool.create(cr, uid, {
+                    'code': cause_name,
+                    'name': cause_name,
+                    }, context=context)
+            cause_id = history_db['cause'].get(cause_name, False)
+            
+                
+            # -----------------------------------------------------------------
+            # Primary record:
+            # -----------------------------------------------------------------
+            data = {
+                # Foreign reference:
+                'cause_id': cause_id,
+                'product_id': product_id,
+                'supplier_id': supplier_id,
+                'partner_id': partner_id,
+                'account_id': account_id,
+                'picking_id': picking_id,
+                
+                'document_date': document_date,
+                'metel_code': default_code,
+                'supplier_code': supplier_code,
+                'picking_name': picking_name,
+                'cause_name': cause_name,
+                'uom': uom,
+                'product_qty': product_qty,
+                'pricelist': pricelist,
+                'standard_price': standard_price,
+                #'supplier_code_2': supplier_code_2,
+                'account_name': account_name,
+                'note': note,
+                }
+            self.create(cr, uid, data, context=context)
+            print data # TODO remove
+
+            #record['CANNBOLL']
+            #record['CNBOLLET']
+            #record['CNUMBOLL']
+            #record['DDATCOMA'] #, datetime.date(2007, 9, 7)), 
+            #record['CFSCARTI']#, u'S'), 
+            #record['CCODPROG']
+            #record['CCODORDI']
+            #record['CCODCECO']
+            #record['CCODSOFA']
+            #record['CRIFPREV']
+            #record['CTLIARTI']
+            #record['CFASCIA']
+            #record['CRIFFATT']
+            #record['CRIFRAPP']
+            #record['CRIFORCL']
+            #record['LPRZSCON']#, False), 
+            #record['CCODPERS']
+            #record['CCONTORI']
+            #record['CCODSOCO']
+            #record['CCODPROGC']
+            #record['NRICARIC']#, 0.0), 
+            #record['NPREZZOL']#, 0.0), 
+            #record['CTIPPREZ']
+            #record['CFILLER']
+            #record['CFILLER1']
+            #record['CLOTFABB']]
+            #record['NPREZZOV']#, 0.0), 
+            #record['CCODPRODFO']
+            #record['NPROVVIG']#, 0.0), 
+            #record['CCODCLAS']
+            #record['CCODARCO']
+            #record['CCODDEPO']
+            #record['CTIPVEND']
+            #record['NQTAPEZZ']#, 0.0), 
+            #record['DDATOPER']#, None), 
+            #record['CORAOPER']
+            #record['CCODUTEN']
+            #record['CCODOPER']
+            #record['NSTSINCR']#, 0), 
+            #record['CFILEPDF']
+            #record['CCANTCOR']
+            #record['MNOTEMAN']#, None)])
+            
+            '''
             # Metel producer code information:
             if metel_producer_code not in producer_db:
                 producer_db[metel_producer_code] = \
@@ -154,11 +284,6 @@ class DbfStockMove(orm.Model):
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
             
-            # Mapping fields:
-            data = {
-                #'lst_price': record['NPREZZOP'],
-                }
-                
             # Search product code:
             product_ids = self.search(cr, uid, [
                 ('default_code', '=', default_code),
