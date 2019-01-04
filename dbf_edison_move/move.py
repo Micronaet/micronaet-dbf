@@ -155,9 +155,11 @@ class DbfStockMove(orm.Model):
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
+            if verbose_log_count and i % verbose_log_count == 0:
+                _logger.info(_('Import stock move #: %s') % i)
 
             # -----------------------------------------------------------------    
-            # Field:
+            # Parse used fields:
             # -----------------------------------------------------------------    
             document_date = record['DDATDOCU'] #, datetime.date(2007, 9, 7)), 
             product_code = record['CCODARTI'] #, u'3FF11746'), 
@@ -174,17 +176,27 @@ class DbfStockMove(orm.Model):
             customer_code = False # TODO customer code
             
             # -----------------------------------------------------------------
-            # Check foreing elements:    
+            #                      CHECK FOREIGN KEYS:
+            # -----------------------------------------------------------------
+            
+            
             # -----------------------------------------------------------------
             # Product reference:
-            if product_code and product_code not in history_db['account']:
+            # -----------------------------------------------------------------
+            if product_code and product_code not in history_db['product']:
                 product_ids = product_pool.search(cr, uid, [
                     ('default_code', '=', product_code),
                     ], context=context)
                 if product_ids:
                     history_db['product'][product_code] = product_ids[0]
-                else:
-                    # No create!
+                    # Check double code:
+                    if len(product_ids) > 1:
+                        log(
+                            log_file, 
+                            _('More than one product: %s') % product_code, 
+                            mode='ERROR',
+                            )
+                else: # No create!
                     log(
                         log_file, 
                         _('Product code not found: %s') % product_code, 
@@ -192,7 +204,9 @@ class DbfStockMove(orm.Model):
                         )
             product_id = history_db['product'].get(product_code, False)
 
+            # -----------------------------------------------------------------
             # Cause reference:
+            # -----------------------------------------------------------------
             if cause_name and cause_name not in history_db['cause']:
                 cause_ids = cause_pool.search(cr, uid, [
                     ('code', '=', cause_name),
@@ -207,8 +221,10 @@ class DbfStockMove(orm.Model):
                             }, context=context)
             cause_id = history_db['cause'].get(cause_name, False)
 
+            # -----------------------------------------------------------------
             # Supplier reference:
-            if supplier_code and supplier_code not in history_db['account']:
+            # -----------------------------------------------------------------
+            if supplier_code and supplier_code not in history_db['supplier']:
                 partner_ids = partner_pool.search(cr, uid, [
                     ('dbf_supplier_code', '=', supplier_code),
                     ], context=context)
@@ -223,7 +239,9 @@ class DbfStockMove(orm.Model):
                         )
             supplier_id = history_db['supplier'].get(supplier_code, False)
 
+            # -----------------------------------------------------------------
             # Partner reference:
+            # -----------------------------------------------------------------
             if customer_code and customer_code not in history_db['customer']:
                 customer_ids = partner_pool.search(cr, uid, [
                     ('dbf_customer_code', '=', customer_code),
@@ -239,7 +257,9 @@ class DbfStockMove(orm.Model):
                         )
             customer_id = history_db['customer'].get(customer_code, False)
 
+            # -----------------------------------------------------------------
             # Account reference:
+            # -----------------------------------------------------------------
             if account_name and account_name not in history_db['account']:
                 account_ids = account_pool.search(cr, uid, [
                     ('code', '=', account_name),
@@ -255,7 +275,9 @@ class DbfStockMove(orm.Model):
                         )
             account_id = history_db['account'].get(account_name, False)
 
+            # -----------------------------------------------------------------
             # TODO If picking_name: create picking document:
+            # -----------------------------------------------------------------
             picking_id = False
             if picking_name:
                 #if (supplier_code, picking_code) 
@@ -333,50 +355,6 @@ class DbfStockMove(orm.Model):
             #record['CCANTCOR']
             #record['MNOTEMAN']#, None)])
             
-            '''
-            # Metel producer code information:
-            if metel_producer_code not in producer_db:
-                producer_db[metel_producer_code] = \
-                    category_pool.get_create_producer_group(
-                        cr, uid, metel_producer_code, metel_producer_code,
-                        context=context)
-
-            if verbose_log_count and i % verbose_log_count == 0:
-                _logger.info(_('Import product #: %s') % i)
-            
-            # Search product code:
-            product_ids = self.search(cr, uid, [
-                ('default_code', '=', default_code),
-                ('metel_producer_code', '=', metel_producer_code),
-                ], context=context)
-            if len(product_ids) > 1:
-                log(
-                    log_file, 
-                    _('More than one product: %s (take last)') % default_code, 
-                    mode='ERROR',
-                    )
-                product_ids = [product_ids[0]]
-
-            if product_ids:
-                try:
-                    self.write(cr, uid, product_ids, data, context=context)
-                except:
-                    del(data['ean13'])   
-                    log(
-                        log_file, _('Error EAN number: %s') % ean13, 
-                        mode='ERROR',
-                        )
-                    self.write(cr, uid, product_ids, data, context=context)
-            else:
-                try:
-                    self.create(cr, uid, data, context=context)
-                except:
-                    del(data['ean13'])    
-                    log(
-                        log_file, _('Error EAN number: %s') % ean13, 
-                        mode='ERROR',
-                        )
-                    self.create(cr, uid, data, context=context)'''
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
