@@ -188,7 +188,7 @@ class DbfStockMove(orm.Model):
 
             # TODO If picking_name: create picking document:
             picking_id = False
-            if picking_code:
+            if picking_name:
                 #if (supplier_code, picking_code) 
                 # TODO picking_id
                 pass
