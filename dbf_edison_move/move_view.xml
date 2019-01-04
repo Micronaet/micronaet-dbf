@@ -1,7 +1,119 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record model="ir.ui.view" id="view_dbf_stock_move_tree">
+            <field name="name">dbf.stock.move.tree</field>
+            <field name="model">dbf.stock.move</field>
+            <field name="arch" type="xml">
+                <tree string="DBF Stock move" editable="bottom">
+                    <field name="picking_id" />
+                    <field name="document_date" />
+                    <field name="cause_id" />
+                    <field name="account_id" />
+                    <field name="supplier_id" />
+                    <field name="partner_id" />
 
+                    <field name="product_id" />
+                    <field name="product_qty" />
+                    <field name="standard_price" />
+                    <field name="listprice" />
+                    <field name="supplier_code" />
+                    <field name="uom" />
+
+                    <!--invisible:-->
+                    <field name="cause_name"  />
+                    <field name="metel_code"  />
+                    <field name="account_name"  />
+                    <field name="picking_name" />
+                    <!--<field name="note" invisible="1" />-->
+                </tree>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_dbf_stock_move_form">
+            <field name="name">dbf.stock.move.tree</field>
+            <field name="model">dbf.stock.move</field>
+            <field name="arch" type="xml">
+                <form string="DBF Stock move" version="7.0">
+                    <sheet>
+                        <group colspan="4" col="4">
+                            <field name="picking_id" />
+                            <field name="document_date" />
+                            <field name="cause_id" />
+                            <field name="account_id" />
+                            <field name="supplier_id" />
+                            <field name="partner_id" />
+
+                            <field name="product_id" />
+                            <field name="product_qty" />
+                            <field name="standard_price" />
+                            <field name="listprice" />
+                            <field name="supplier_code" />
+                            <field name="uom" />
+
+                            <!--invisible:-->
+                            <field name="cause_name"  />
+                            <field name="metel_code"  />
+                            <field name="account_name"  />
+                            <field name="picking_name" />
+                            
+                            <separator string="Note" colspan="4"/>
+                            <field name="note" colspan="4" nolabel="1" />
+                        </group>    
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_dbf_stock_move_search">
+            <field name="name">dbf.stock.move.search</field>
+            <field name="model">dbf.stock.move</field>
+            <field name="arch" type="xml">
+                <search string="DBF Stock move" version="7.0">        
+                    <field name="picking_id" filter_domain="[('picking_id','=',self)]" />
+                    <field name="cause_id" filter_domain="[('cause_id','=',self)]" />
+                    <field name="account_id" filter_domain="[('account_id','=',self)]" />
+                    <field name="supplier_id" filter_domain="[('supplier_id','=',self)]" />
+                    <field name="partner_id" filter_domain="[('partner_id','=',self)]" />
+
+                    <field name="product_id" filter_domain="[('product_id','=',self)]" />
+
+                    <!--<field name="partner_id" filter_domain="[('partner_id','=',self)]"/>-->
+                    <!--<filter name="state_draft" string="Draft state" domain="[('state','=','draft')]"/>-->
+                    <group expand="0" string="Group By...">
+                        <filter name="group_picking" string="Picking" context="{'group_by': 'picking_id'}"/>
+                        <filter name="group_cause" string="Cause" context="{'group_by': 'cause_id'}"/>
+                        <filter name="group_account" string="Account" context="{'group_by': 'account_id'}"/>
+                        <filter name="group_supplier" string="Supplier" context="{'group_by': 'supplier_id'}"/>
+                        <filter name="group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                        <filter name="group_document_date" string="Document Date" context="{'group_by': 'document_date'}"/>
+                    </group>                
+                </search>
+            </field>
+        </record>        
+        <record model="ir.actions.act_window" id="action_dbf_stock_move">
+            <field name="name">Histroy Stock movement</field>
+            <field name="res_model">dbf.stock.move</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_dbf_stock_move_tree"/>
+            <field name="search_view_id" ref="view_dbf_stock_move_search"/>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+        
+        <menuitem 
+            parent="stock.menu_stock_root" 
+            id="menu_dbf_history_root" 
+            name="History movement"
+            sequence="10"
+            />
+            <menuitem 
+                parent="menu_dbf_history_root" 
+                id="menu_dbf_history_stock_move" 
+                action="action_dbf_stock_move"
+                sequence="10"
+                />
+            
     </data>
 </openerp>
 
