@@ -107,6 +107,7 @@ class DbfStockMove(orm.Model):
         'supplier_code': fields.char('Supplier code', size=6),
         'uom': fields.char('UOM', size=6),
         'note': fields.text('Note'),
+        'error': fields.boolean('Error'),
         }
 
     def schedule_dbf_edison_move_import(self, cr, uid, 
@@ -177,9 +178,6 @@ class DbfStockMove(orm.Model):
             
             # -----------------------------------------------------------------
             #                      CHECK FOREIGN KEYS:
-            # -----------------------------------------------------------------
-            
-            
             # -----------------------------------------------------------------
             # Product reference:
             # -----------------------------------------------------------------
@@ -366,5 +364,15 @@ class DbfStockMove(orm.Model):
         except:
             return False    
         return True        
+
+class DbfStockPicking(orm.Model):
+    """ Model name: Dbf Stock picking
+    """
+    
+    _inherit = 'dbf.stock.picking'
+
+    _columns = {
+        'line_ids': fields.one2many('dbf.stock.move', 'picking_id', 'Detail'),
+        }
             
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

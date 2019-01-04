@@ -26,7 +26,7 @@
                 </form>
             </field>
         </record>
-        <record model="ir.actions.act_window" "action_dbf_stock_cause">
+        <record model="ir.actions.act_window" id="action_dbf_stock_cause">
             <field name="name">Stock cause</field>
             <field name="res_model">dbf.stock.cause</field>
             <field name="view_type">form</field>
@@ -42,8 +42,10 @@
             <field name="model">dbf.stock.picking</field>
             <field name="arch" type="xml">
                 <tree string="Picking">
-                    <field name="code" />
-                    <field name="name" />
+                        <field name="name" />
+                        <field name="partner_id" />
+                        <field name="document_date" />
+                        <field name="insert_date" />
                 </tree>
             </field>
         </record>
@@ -54,14 +56,26 @@
                 <form string="Picking" version="7.0">
                     <sheet>
                         <group colspan="4" col="4">                        
-                            <field name="code" />
                             <field name="name" />
+                            <field name="document_date" />
+                            <field name="partner_id" />
+                            <field name="insert_date" />
+                            <separator string="Detail:" colspan="4"/>
+                            <field name="line_ids" colspan="4" nolabel="4">
+                                <tree string="Detail">
+                                    <field name="product_id" />
+                                    <field name="uom" />
+                                    <field name="product_qty" />
+                                    <field name="standard_price" />
+                                    <field name="listprice" />
+                                </tree>
+                            </field>
                         </group>    
                     </sheet>
                 </form>
             </field>
         </record>
-        <record model="ir.actions.act_window" "action_dbf_stock_picking">
+        <record model="ir.actions.act_window" id="action_dbf_stock_picking">
             <field name="name">Stock picking</field>
             <field name="res_model">dbf.stock.picking</field>
             <field name="view_type">form</field>
@@ -76,7 +90,7 @@
             <field name="name">dbf.stock.move.tree</field>
             <field name="model">dbf.stock.move</field>
             <field name="arch" type="xml">
-                <tree string="DBF Stock move" editable="bottom">
+                <tree string="DBF Stock move" editable="bottom" colors="red:error==True">
                     <field name="picking_id" />
                     <field name="document_date" />
                     <field name="cause_id" />
@@ -88,14 +102,15 @@
                     <field name="product_qty" />
                     <field name="standard_price" />
                     <field name="listprice" />
-                    <field name="supplier_code" />
                     <field name="uom" />
+                    <field name="error" invisible="1" />
 
                     <!--invisible:-->
+                    <!--<field name="supplier_code" />
                     <field name="cause_name"  />
                     <field name="metel_code"  />
                     <field name="account_name"  />
-                    <field name="picking_name" />
+                    <field name="picking_name" />-->
                     <!--<field name="note" invisible="1" />-->
                 </tree>
             </field>
@@ -122,10 +137,11 @@
                             <field name="uom" />
 
                             <!--invisible:-->
-                            <!--<field name="cause_name"  />
+                            <field name="supplier_code"  />
+                            <field name="cause_name"  />
                             <field name="metel_code"  />
                             <field name="account_name"  />
-                            <field name="picking_name" />-->
+                            <field name="picking_name" />
                             
                             <separator string="Note" colspan="4"/>
                             <field name="note" colspan="4" nolabel="1" />
@@ -144,11 +160,9 @@
                     <field name="account_id" filter_domain="[('account_id','=',self)]" />
                     <field name="supplier_id" filter_domain="[('supplier_id','=',self)]" />
                     <field name="partner_id" filter_domain="[('partner_id','=',self)]" />
-
                     <field name="product_id" filter_domain="[('product_id','=',self)]" />
 
-                    <!--<field name="partner_id" filter_domain="[('partner_id','=',self)]"/>-->
-                    <!--<filter name="state_draft" string="Draft state" domain="[('state','=','draft')]"/>-->
+                    <filter name="error_true" string="Error" domain="[('error','=',True)]"/>
                     <group expand="0" string="Group By...">
                         <filter name="group_picking" string="Picking" context="{'group_by': 'picking_id'}"/>
                         <filter name="group_cause" string="Cause" context="{'group_by': 'cause_id'}"/>
