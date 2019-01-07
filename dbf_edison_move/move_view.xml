@@ -162,7 +162,7 @@
                     <field name="supplier_id" filter_domain="[('supplier_id','=',self)]" />
                     <field name="partner_id" filter_domain="[('partner_id','=',self)]" />
                     <field name="product_id" filter_domain="[('product_id','=',self)]" />
-                    <field name="product_code" />
+                    <field name="metel_code" />
 
                     <filter name="error_true" string="Error" domain="[('error','=',True)]"/>
                     <group expand="0" string="Group By...">
@@ -178,7 +178,7 @@
             </field>
         </record>        
         <record model="ir.actions.act_window" id="action_dbf_stock_move">
-            <field name="name">Histroy Stock movement</field>
+            <field name="name">History Stock movement</field>
             <field name="res_model">dbf.stock.move</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
