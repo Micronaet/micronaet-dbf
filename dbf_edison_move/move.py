@@ -66,8 +66,7 @@ class DbfStockPicking(orm.Model):
         'name': fields.char('Name', size=64, required=True),
         'document_date': fields.date('Document date'),
         'insert_date': fields.date('Insert date'),
-        'partner_id': fields.many2one(
-            'res.partner', 'Supplier'),
+        'partner_id': fields.many2one('res.partner', 'Supplier'),
         'partner_code': fields.char('Supplier code', size=64),
         }
 
@@ -287,7 +286,7 @@ class DbfStockMove(orm.Model):
             if picking_name and supplier_code:
                 key = (supplier_code, picking_name, document_date) 
                 if key not in history_db['picking']:
-                    picking_ids = account_pool.search(cr, uid, [
+                    picking_ids = picking_pool.search(cr, uid, [
                         ('partner_code', '=', supplier_code),
                         ('name', '=', picking_name),
                         ('document_date', '=', document_date),                        
