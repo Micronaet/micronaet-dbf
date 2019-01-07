@@ -68,6 +68,7 @@ class DbfStockPicking(orm.Model):
         'insert_date': fields.date('Insert date'),
         'partner_id': fields.many2one(
             'res.partner', 'Supplier'),
+        'partner_code': fields.char('Supplier code', size=64),
         }
 
 class DbfStockMove(orm.Model):
@@ -283,13 +284,25 @@ class DbfStockMove(orm.Model):
             # TODO If picking_name: create picking document:
             # -----------------------------------------------------------------
             picking_id = False
-            if picking_name:
-                #if (supplier_code, picking_code) 
-                # TODO picking_id
-                pass
-            if not error and picking_name and not picking_id:
-                error = True
-                
+            if picking_name and supplier_code:
+                key = (supplier_code, picking_name) 
+                if key not in history_db['picking']:
+                    picking_ids = account_pool.search(cr, uid, [
+                        ('partner_code', '=', supplier_code),
+                        ('name', '=', picking_name),
+                        ], context=context)
+                    if picking_ids:
+                        history_db['picking'][key] = picking_ids[0]                        
+                    else:
+                        history_db['picking'][key] = picking_pool.create(
+                            cr, uid, {
+                                'document_date': document_date,
+                                'name': picking_name,
+                                'partner_id': supplier_id,
+                                'partner_code': supplier_code,
+                                }, context=context)                    
+                picking_id = history_db['picking'].get(key, False)
+
             # -----------------------------------------------------------------
             # Primary record:
             # -----------------------------------------------------------------

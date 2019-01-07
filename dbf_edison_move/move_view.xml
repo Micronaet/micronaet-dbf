@@ -98,6 +98,7 @@
                     <field name="supplier_id" />
                     <field name="partner_id" />
 
+                    <field name="metel_code"  />
                     <field name="product_id" />
                     <field name="product_qty" />
                     <field name="standard_price" />
@@ -161,6 +162,7 @@
                     <field name="supplier_id" filter_domain="[('supplier_id','=',self)]" />
                     <field name="partner_id" filter_domain="[('partner_id','=',self)]" />
                     <field name="product_id" filter_domain="[('product_id','=',self)]" />
+                    <field name="product_code" />
 
                     <filter name="error_true" string="Error" domain="[('error','=',True)]"/>
                     <group expand="0" string="Group By...">
