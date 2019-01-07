@@ -61,8 +61,9 @@
                             <field name="partner_id" />
                             <field name="insert_date" />
                             <separator string="Detail:" colspan="4"/>
-                            <field name="line_ids" colspan="4" nolabel="4">
+                            <field name="line_ids" colspan="4" nolabel="1">
                                 <tree string="Detail">
+                                    <field name="metel_code" />
                                     <field name="product_id" />
                                     <field name="uom" />
                                     <field name="product_qty" />
