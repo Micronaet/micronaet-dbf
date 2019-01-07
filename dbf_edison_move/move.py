@@ -285,11 +285,12 @@ class DbfStockMove(orm.Model):
             # -----------------------------------------------------------------
             picking_id = False
             if picking_name and supplier_code:
-                key = (supplier_code, picking_name) 
+                key = (supplier_code, picking_name, document_date) 
                 if key not in history_db['picking']:
                     picking_ids = account_pool.search(cr, uid, [
                         ('partner_code', '=', supplier_code),
                         ('name', '=', picking_name),
+                        ('document_date', '=', document_date),                        
                         ], context=context)
                     if picking_ids:
                         history_db['picking'][key] = picking_ids[0]                        
