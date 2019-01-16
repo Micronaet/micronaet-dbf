@@ -331,7 +331,6 @@ class DbfStockMove(orm.Model):
                 'note': note,
                 }
             self.create(cr, uid, data, context=context)
-            print data # TODO remove
 
             #record['CANNBOLL']
             #record['CNBOLLET']

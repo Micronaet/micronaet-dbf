@@ -37,6 +37,21 @@
         </record>
         
         <!--dbf.stock.picking-->
+        <record model="ir.ui.view" id="view_dbf_stock_picking_search">
+            <field name="name">dbf.stock.picking.search</field>
+            <field name="model">dbf.stock.picking</field>
+            <field name="arch" type="xml">
+                <search string="Picking" version="7.0">        
+                    <field name="name" />
+                    <field name="partner_id" filter_domain="[('partner_id','=',self)]"/>
+                    <group expand="0" string="Group By...">
+                        <filter name="group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                        <filter name="group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+                        <filter string="Status" context="{'group_by': 'state'}" />
+                    </group>                
+                </search>
+            </field>
+        </record>
         <record model="ir.ui.view" id="view_dbf_stock_picking_tree">
             <field name="name">dbf.stock.picking.tree</field>
             <field name="model">dbf.stock.picking</field>
@@ -44,6 +59,7 @@
                 <tree string="Picking">
                         <field name="name" />
                         <field name="partner_id" />
+                        <field name="partner_code" />
                         <field name="document_date" />
                         <field name="insert_date" />
                 </tree>

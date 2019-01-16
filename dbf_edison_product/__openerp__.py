@@ -35,7 +35,9 @@
     'init_xml': [],
     'demo': [],
     'data': [
+        'security/ir.model.access.csv',
         'product_view.xml',
+        'dbf_product_view.xml',
         'scheduler.xml',
         ],
     'active': False,

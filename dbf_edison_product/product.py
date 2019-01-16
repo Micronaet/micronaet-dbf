@@ -47,9 +47,11 @@ class ProductProduct(orm.Model):
     _inherit = 'product.product'
     
     def schedule_dbf_edison_product_import(self, cr, uid, 
-            verbose_log_count=100, log_name='product.log',
+            verbose_log_count=100, log_name='product.log', mode='product',
             context=None):
         ''' Import product from external DBF
+            mode: product (only product.product), mirror (only mirror), 
+                  all (both)
         '''
         # ---------------------------------------------------------------------
         #                      COMMON PART: Get parameter
@@ -57,6 +59,7 @@ class ProductProduct(orm.Model):
         # Browse company: 
         company_pool = self.pool.get('res.company')
         category_pool = self.pool.get('product.category')
+        mirror_pool = self.pool.get('dbf.product.product')
         
         # Log:
         log_file = company_pool.get_dbf_logfile(
@@ -80,11 +83,38 @@ class ProductProduct(orm.Model):
             # -----------------------------------------------------------------    
             metel_producer_code = record['CCODPROD']
             default_code = record['CCODARTI']
-            if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
-                continue
             name = record['CDESARTI']
             ean13 = record['CCODARPR']            
 
+            if verbose_log_count and i % verbose_log_count == 0:
+                _logger.info(_('Import product #: %s') % i)
+                
+            # -----------------------------------------------------------------
+            # Update mirror table:
+            # -----------------------------------------------------------------
+            if mode in ('mirror' or 'all'):
+                mirror_ids = mirror_pool.search(cr, uid, [
+                    ('default_code', '=', default_code),
+                    ], context=context)
+                mirror_data = {
+                    'default_code': default_code,
+                    'name': name,
+                    'standard_price': record['NPREZZOP'],
+                    'description': record['MMEMO'],
+                    'metel_producer_code': metel_producer_code,
+                    #'product_id': False, # TODO
+                    }    
+                if mirror_ids:
+                    mirror_pool.write(
+                        cr, uid, mirror_ids, mirror_data, context=context)
+                else:    
+                    mirror_pool.create(
+                        cr, uid, mirror_data, context=context)
+                        
+            if mode == 'mirror':
+                continue # no more update!
+            # -----------------------------------------------------------------
+            
             # Metel producer code information:
             metel_producer_code = '%s-' % metel_producer_code
             if metel_producer_code not in producer_db:
@@ -92,11 +122,10 @@ class ProductProduct(orm.Model):
                     category_pool.get_create_producer_group(
                         cr, uid, metel_producer_code, metel_producer_code,
                         context=context)
+                        
+            if len(metel_producer_code or '') >=3 or default_code[2:3] != '-':
+                continue
 
-            if verbose_log_count and i % verbose_log_count == 0:
-                _logger.info(_('Import product #: %s') % i)
-            
-            print record # TODO remove
             # Mapping fields:
             data = {
                 'dbf_import': True,
