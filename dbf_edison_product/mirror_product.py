@@ -51,7 +51,7 @@ class DbfProductProduct(orm.Model):
     _columns = {
         'name': fields.char('Name', size=80, required=True),
         'metel_producer_code': fields.char('METEL Producer', size=3),
-        'default_code': fields.char('Name', size=20),
+        'default_code': fields.char('Code', size=20),
         'ean13': fields.char('EAN 13', size=13),
         'standard_price': fields.float('Standard price', digits=(16, 3)),
         'product_id': fields.many2one('product.product', 'Product'),
