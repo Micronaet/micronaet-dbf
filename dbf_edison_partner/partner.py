@@ -94,9 +94,12 @@ class ResPartner(orm.Model):
                 
                 # Mapping fields:
                 ref = record[mapping['ref']]
-                name = '%s %s' % (
-                    record[mapping['name1']] or '',
-                    record[mapping['name2']] or '',
+                name1 = record[mapping['name1']] or ''
+                name2 = (record[mapping['name2']] or '').strip()
+                name = '%s%s%s' % (
+                    name1,
+                    ' ' if name2 else '',
+                    name2,
                     )
                 vat = record['CPARTIVA']
                 if vat and vat[:1].isdigit():
