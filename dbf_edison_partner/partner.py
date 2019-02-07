@@ -94,7 +94,7 @@ class ResPartner(orm.Model):
                 
                 # Mapping fields:
                 ref = record[mapping['ref']]
-                name = '%s%s' % (
+                name = '%s %s' % (
                     record[mapping['name1']] or '',
                     record[mapping['name2']] or '',
                     )
