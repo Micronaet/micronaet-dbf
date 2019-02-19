@@ -145,7 +145,8 @@ class DbfStockMove(orm.Model):
             'account': {},
             'supplier': {},
             'customer': {},
-            'picking': {},         
+            'picking': {},
+            'standard_price': {},
             }
 
         # Clean all previous database:
@@ -153,6 +154,7 @@ class DbfStockMove(orm.Model):
         cr.execute('DELETE from dbf_stock_move;')
         
         # TODO manage last price update   
+        import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
@@ -180,7 +182,7 @@ class DbfStockMove(orm.Model):
             
             # -----------------------------------------------------------------
             #                      CHECK FOREIGN KEYS:
-            # -----------------------------------------------------------------
+            # -----------------------------------------------------------------            
             # Product reference:
             # -----------------------------------------------------------------
             if product_code and product_code not in history_db['product']:
@@ -203,6 +205,22 @@ class DbfStockMove(orm.Model):
                         mode='ERROR',
                         )
             product_id = history_db['product'].get(product_code, False)
+            
+            # -----------------------------------------------------------------
+            # Standard price:
+            # -----------------------------------------------------------------
+            if product_id and standard_price: # Product found update standard
+                if product_id not in history_db['standard_price']:
+                    # Create record:
+                    history_db['standard_price'][product_id] = [
+                        document_date, standard_price]
+                elif document_date > history_db['standard_price'][
+                        product_id][0]:
+                    # Update present:
+                    history_db['standard_price'][product_id][0] = \
+                        document_date
+                    history_db['standard_price'][product_id][1] = \
+                        standard_price
 
             # -----------------------------------------------------------------
             # Cause reference:
@@ -320,13 +338,13 @@ class DbfStockMove(orm.Model):
                 'document_date': document_date,
                 'metel_code': product_code,
                 'supplier_code': supplier_code,
+                #'supplier_code_2': supplier_code_2,
                 'picking_name': picking_name,
                 'cause_name': cause_name,
                 'uom': uom,
                 'product_qty': product_qty,
                 'listprice': listprice,
                 'standard_price': standard_price,
-                #'supplier_code_2': supplier_code_2,
                 'account_name': account_name,
                 'note': note,
                 }
@@ -380,7 +398,20 @@ class DbfStockMove(orm.Model):
             _('End import. Tot: %s\n') % i,
             mode='INFO',
             )
-        
+
+        # Update standard_price on anagrafic:
+        product_ids = product_pool.search(cr, uid, [
+            ('standard_price', '>', 0),
+            ], context=context)
+        for product_id in history_db['standard_price']:
+            if product_id in product_ids:
+                continue # not updated:
+            standard_price_date, standard_price = \
+                history_db['standard_price'][product_id]
+            product_pool.write(cr, uid, [product_id], {
+                'standard_price': standard_price,
+                'standard_price_date': standard_price_date,
+                }, context=context) 
         try:
             log_file.close()
         except:
