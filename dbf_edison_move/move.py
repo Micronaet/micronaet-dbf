@@ -95,15 +95,15 @@ class DbfStockMove(orm.Model):
 
         # Foreing name (used to create external ID):
         'cause_name': fields.char('Cause code', size=6),
-        'metel_code': fields.char('Metel code', size=6),
+        'metel_code': fields.char('Metel code', size=25),
         'account_name': fields.char('Account name', size=6),
         'picking_name': fields.char('Picking name', size=6),
 
         # Mode data:
         'document_date': fields.date('Document date'),
         'product_qty': fields.float('Qty', digits=(16, 2)),
-        'standard_price': fields.float('Price', digits=(16, 2)),
-        'listprice': fields.float('List Price', digits=(16, 2)),
+        'standard_price': fields.float('Price', digits=(16, 4)),
+        'listprice': fields.float('List Price', digits=(16, 4)),
         'supplier_code': fields.char('Supplier code', size=6),
         'uom': fields.char('UOM', size=6),
         'note': fields.text('Note'),
@@ -146,7 +146,7 @@ class DbfStockMove(orm.Model):
             'supplier': {},
             'customer': {},
             'picking': {},
-            'standard_price': {},
+            #'standard_price': {},
             }
 
         # Clean all previous database:
@@ -154,7 +154,6 @@ class DbfStockMove(orm.Model):
         cr.execute('DELETE from dbf_stock_move;')
         
         # TODO manage last price update   
-        import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
@@ -209,18 +208,18 @@ class DbfStockMove(orm.Model):
             # -----------------------------------------------------------------
             # Standard price:
             # -----------------------------------------------------------------
-            if product_id and standard_price: # Product found update standard
-                if product_id not in history_db['standard_price']:
-                    # Create record:
-                    history_db['standard_price'][product_id] = [
-                        document_date, standard_price]
-                elif document_date > history_db['standard_price'][
-                        product_id][0]:
-                    # Update present:
-                    history_db['standard_price'][product_id][0] = \
-                        document_date
-                    history_db['standard_price'][product_id][1] = \
-                        standard_price
+            #if product_id and standard_price: # Product found update standard
+            #    if product_id not in history_db['standard_price']:
+            #        # Create record:
+            #        history_db['standard_price'][product_id] = [
+            #            document_date, standard_price]
+            #    elif document_date > history_db['standard_price'][
+            #            product_id][0]:
+            #        # Update present:
+            #        history_db['standard_price'][product_id][0] = \
+            #            document_date
+            #        history_db['standard_price'][product_id][1] = \
+            #            standard_price
 
             # -----------------------------------------------------------------
             # Cause reference:
@@ -400,19 +399,21 @@ class DbfStockMove(orm.Model):
             )
 
         # Update standard_price on anagrafic:
-        product_ids = product_pool.search(cr, uid, [
-            ('standard_price', '>', 0),
-            ], context=context)
-        import pdb; pdb.set_trace()
-        for product_id in history_db['standard_price']:
-            if product_id in product_ids:
-                continue # not updated:
-            standard_price_date, standard_price = \
-                history_db['standard_price'][product_id]
-            product_pool.write(cr, uid, [product_id], {
-                'standard_price': standard_price,
-                'standard_price_date': standard_price_date,
-                }, context=context) 
+        #product_ids = product_pool.search(cr, uid, [
+        #    ('standard_price', '>', 0),
+        #    ], context=context)
+        #history_ids = self.search(cr, uid, [
+        #    ('standard_price', '>', 0)], context=context)    
+
+        #for product_id in history_db['standard_price']:
+        #    if product_id in product_ids:
+        #        continue # not updated:
+        #    standard_price_date, standard_price = \
+        #        history_db['standard_price'][product_id]
+        #    product_pool.write(cr, uid, [product_id], {
+        #        'standard_price': standard_price,
+        #        'standard_price_date': standard_price_date,
+        #        }, context=context) 
         try:
             log_file.close()
         except:
