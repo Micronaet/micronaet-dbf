@@ -111,7 +111,7 @@ class DbfStockMove(orm.Model):
         }
 
     def schedule_dbf_edison_move_import(self, cr, uid, 
-            verbose_log_count=100, log_name='move.log',
+            verbose_log_count=100, log_name='move.log', update_price=False,
             context=None):
         ''' Import stock move from external DBF
         '''
@@ -401,33 +401,25 @@ class DbfStockMove(orm.Model):
         # ---------------------------------------------------------------------
         # Update standard_price on anagrafic:
         # ---------------------------------------------------------------------
-        _logger.info('Update last price in product')
-        product_ids = product_pool.search(cr, uid, [
-            ('standard_price', '>', 0),
-            ], context=context)
-        history_ids = self.search(cr, uid, [
-            ('standard_price', '>', 0),
-            ('product_id', '!=', False),
-            ], context=context)
-            
-        for history in self.browse(cr, uid, history_ids, context=context):
-            product_id = history.product_id.id
-            if product_id in product_ids:
-                continue
-            product_pool.write(cr, uid, [product_id], {
-                'standard_price': history.standard_price,
-                'standard_price_date': history.document_date,                
-                }, context=context)
+        if update_price:
+            _logger.info('Update last price in product')
+            product_ids = product_pool.search(cr, uid, [
+                ('standard_price', '>', 0),
+                ], context=context)
+            history_ids = self.search(cr, uid, [
+                ('standard_price', '>', 0),
+                ('product_id', '!=', False),
+                ], context=context)
+                
+            for history in self.browse(cr, uid, history_ids, context=context):
+                product_id = history.product_id.id
+                if product_id in product_ids:
+                    continue
+                product_pool.write(cr, uid, [product_id], {
+                    'standard_price': history.standard_price,
+                    'standard_price_date': history.document_date,                
+                    }, context=context)
 
-        #for product_id in history_db['standard_price']:
-        #    if product_id in product_ids:
-        #        continue # not updated:
-        #    standard_price_date, standard_price = \
-        #        history_db['standard_price'][product_id]
-        #    product_pool.write(cr, uid, [product_id], {
-        #        'standard_price': standard_price,
-        #        'standard_price_date': standard_price_date,
-        #        }, context=context) 
         try:
             log_file.close()
         except:
