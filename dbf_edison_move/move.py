@@ -174,6 +174,7 @@ class DbfStockMove(orm.Model):
             supplier_code_2 = record['CCODFOR2'] #, u'000761'), 
             account_name = record['CCODCANT']
             note = record['MMEMO']
+            import pdb; pdb.set_trace()
             customer_code = False # TODO customer code
             
             error = False
