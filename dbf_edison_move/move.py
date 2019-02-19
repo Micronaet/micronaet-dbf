@@ -146,7 +146,6 @@ class DbfStockMove(orm.Model):
             'supplier': {},
             'customer': {},
             'picking': {},
-            #'standard_price': {},
             }
 
         # Clean all previous database:
@@ -205,22 +204,6 @@ class DbfStockMove(orm.Model):
                         )
             product_id = history_db['product'].get(product_code, False)
             
-            # -----------------------------------------------------------------
-            # Standard price:
-            # -----------------------------------------------------------------
-            #if product_id and standard_price: # Product found update standard
-            #    if product_id not in history_db['standard_price']:
-            #        # Create record:
-            #        history_db['standard_price'][product_id] = [
-            #            document_date, standard_price]
-            #    elif document_date > history_db['standard_price'][
-            #            product_id][0]:
-            #        # Update present:
-            #        history_db['standard_price'][product_id][0] = \
-            #            document_date
-            #        history_db['standard_price'][product_id][1] = \
-            #            standard_price
-
             # -----------------------------------------------------------------
             # Cause reference:
             # -----------------------------------------------------------------
@@ -309,6 +292,12 @@ class DbfStockMove(orm.Model):
                         ('document_date', '=', document_date),                        
                         ], context=context)
                     if picking_ids:
+                        picking_pool.write(cr, uid, picking_ids[0], {
+                                #'document_date': document_date,
+                                #'name': picking_name,
+                                'partner_id': supplier_id,
+                                'partner_code': supplier_code,
+                                }, context=context)                    
                         history_db['picking'][key] = picking_ids[0]                        
                     else:
                         history_db['picking'][key] = picking_pool.create(
