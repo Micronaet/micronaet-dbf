@@ -403,6 +403,7 @@ class DbfStockMove(orm.Model):
         product_ids = product_pool.search(cr, uid, [
             ('standard_price', '>', 0),
             ], context=context)
+        import pdb; pdb.set_trace()
         for product_id in history_db['standard_price']:
             if product_id in product_ids:
                 continue # not updated:
