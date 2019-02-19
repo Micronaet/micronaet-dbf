@@ -398,12 +398,26 @@ class DbfStockMove(orm.Model):
             mode='INFO',
             )
 
+        # ---------------------------------------------------------------------
         # Update standard_price on anagrafic:
-        #product_ids = product_pool.search(cr, uid, [
-        #    ('standard_price', '>', 0),
-        #    ], context=context)
-        #history_ids = self.search(cr, uid, [
-        #    ('standard_price', '>', 0)], context=context)    
+        # ---------------------------------------------------------------------
+        _logger.info('Update last price in product')
+        product_ids = product_pool.search(cr, uid, [
+            ('standard_price', '>', 0),
+            ], context=context)
+        history_ids = self.search(cr, uid, [
+            ('standard_price', '>', 0),
+            ('product_id', '!=', False),
+            ], context=context)
+            
+        for history in self.browse(cr, uid, history_ids, context=context):
+            product_id = history.product_id.id
+            if product_id in product_ids:
+                continue
+            product_pool.write(cr, uid, [product_id], {
+                'standard_price': history.standard_price,
+                'standard_price_date': history.document_date,                
+                }, context=context)
 
         #for product_id in history_db['standard_price']:
         #    if product_id in product_ids:
