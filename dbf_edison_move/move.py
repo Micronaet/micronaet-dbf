@@ -164,13 +164,13 @@ class DbfStockMove(orm.Model):
             # -----------------------------------------------------------------                
             document_date = record['DDATDOCU'] #, datetime.date(2007, 9, 7)), 
             product_code = record['CCODARTI'] #, u'3FF11746'), 
-            #supplier_code = record['CCODFORN'] #, u'000001'), 
             picking_name = record['CRIFDOCU'] #, u'882909'), 
             cause_name = record['CCODCATR'] #, u'10'), 
             uom = record['CCODUNMI'] #, u'NR'), 
             product_qty = record['NQTAARTI'] #, 2.0), 
             listprice = record['NPREZZO'] #, 0.0), 
             standard_price = record['NPREZZOCS'] #, 66.38), 
+            #supplier_code = record['CCODFORN'] #, u'000001'), 
             supplier_code = record['CCODFOR2'] #, u'000761'), 
             account_name = record['CCODCANT']
             note = record['MMEMO']
