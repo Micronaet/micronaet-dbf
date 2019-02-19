@@ -173,7 +173,7 @@ class DbfStockMove(orm.Model):
             standard_price = record['NPREZZOCS'] #, 66.38), 
             #supplier_code = record['CCODFORN'] #, u'000001'), 
             supplier_code = record['CCODFOR2'] #, u'000761'), 
-            account_name = record['CCODCANT']
+            account_name = (record['CCODCANT'] or '')[2:]
             note = record['MMEMO']
             customer_code = False # TODO customer code
             
