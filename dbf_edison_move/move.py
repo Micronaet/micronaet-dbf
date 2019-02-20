@@ -104,6 +104,7 @@ class DbfStockMove(orm.Model):
         'product_qty': fields.float('Qty', digits=(16, 2)),
         'standard_price': fields.float('Price', digits=(16, 4)),
         'listprice': fields.float('List Price', digits=(16, 4)),
+        'supplier_code_ref': fields.char('Supplier code ref', size=6),
         'supplier_code': fields.char('Supplier code', size=6),
         'uom': fields.char('UOM', size=6),
         'note': fields.text('Note'),
@@ -170,13 +171,16 @@ class DbfStockMove(orm.Model):
             product_qty = record['NQTAARTI'] #, 2.0), 
             listprice = record['NPREZZO'] #, 0.0), 
             standard_price = record['NPREZZOCS'] #, 66.38), 
-            #supplier_code = record['CCODFORN'] #, u'000001'), 
+            supplier_code_ref = record['CCODFORN'] or '' #, u'000001'), 
             supplier_code = record['CCODFOR2'] #, u'000761'), 
             account_name = (record['CCODCANT'] or '')[2:]
             note = record['MMEMO']
             customer_code = False # TODO customer code
             
             error = False
+            if document_date:
+                document_date = document_date.strftime(
+                    DEFAULT_SERVER_DATE_FORMAT)
             
             # -----------------------------------------------------------------
             #                      CHECK FOREIGN KEYS:
@@ -325,8 +329,8 @@ class DbfStockMove(orm.Model):
                 
                 'document_date': document_date,
                 'metel_code': product_code,
+                'supplier_code_ref': supplier_code_ref,
                 'supplier_code': supplier_code,
-                #'supplier_code_2': supplier_code_2,
                 'picking_name': picking_name,
                 'cause_name': cause_name,
                 'uom': uom,
@@ -379,8 +383,7 @@ class DbfStockMove(orm.Model):
             #record['NSTSINCR']#, 0), 
             #record['CFILEPDF']
             #record['CCANTCOR']
-            #record['MNOTEMAN']#, None)])
-            
+            #record['MNOTEMAN']#, None)])            
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
