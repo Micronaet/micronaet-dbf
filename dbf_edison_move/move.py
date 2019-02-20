@@ -395,26 +395,39 @@ class DbfStockMove(orm.Model):
         # ---------------------------------------------------------------------
         if update_price:
             _logger.info('Update last price in product')
-            # Product without last buy price:
+            # Product without setted date:
             product_ids = product_pool.search(cr, uid, [
-                ('standard_price', '>', 0),
+                #('standard_price', '>', 0),
+                ('standard_price_date', '!=', False),
                 ], context=context)
-            
+            product_db = {}    
+            for product in product_pool.browse(cr, uid, product_ids, 
+                    context=context):
+                product_db[product.id] = product.standard_price_date
+
             # History movement with date, product and price    
             history_ids = self.search(cr, uid, [
                 ('standard_price', '>', 0),
                 ('product_id', '!=', False),
                 ('document_date', '!=', False),
                 ], context=context)
-                
+
             for history in self.browse(cr, uid, history_ids, context=context):
                 product_id = history.product_id.id
-                if product_id in product_ids:
+                document_date = history.document_date
+                standard_price = history.standard_price
+                
+                # Price check:
+                if not standard_price:
                     continue
-                product_pool.write(cr, uid, [product_id], {
-                    'standard_price': history.standard_price,
-                    'standard_price_date': history.document_date,                
-                    }, context=context)
+
+                # Date check:
+                current_date = product_db.get(product_id, False):
+                if not current_date or document_date >= current_date:    
+                    product_pool.write(cr, uid, [product_id], {
+                        'standard_price': standard_price,
+                        'standard_price_date': document_date,
+                        }, context=context)
 
         try:
             log_file.close()
