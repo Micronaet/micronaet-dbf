@@ -422,8 +422,8 @@ class DbfStockMove(orm.Model):
                     continue
 
                 # Date check:
-                current_date = product_db.get(product_id, False):
-                if not current_date or document_date >= current_date:    
+                current_date = product_db.get(product_id, False)
+                if not current_date or document_date >= current_date:
                     product_pool.write(cr, uid, [product_id], {
                         'standard_price': standard_price,
                         'standard_price_date': document_date,
