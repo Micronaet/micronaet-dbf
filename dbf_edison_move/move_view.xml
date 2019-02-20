@@ -161,7 +161,6 @@
                             <field name="uom" />
 
                             <!--invisible:-->
-                            <field name="supplier_code"  />
                             <field name="cause_name"  />
                             <field name="metel_code"  />
                             <field name="account_name"  />

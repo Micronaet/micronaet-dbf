@@ -395,12 +395,16 @@ class DbfStockMove(orm.Model):
         # ---------------------------------------------------------------------
         if update_price:
             _logger.info('Update last price in product')
+            # Product without last buy price:
             product_ids = product_pool.search(cr, uid, [
                 ('standard_price', '>', 0),
                 ], context=context)
+            
+            # History movement with date, product and price    
             history_ids = self.search(cr, uid, [
                 ('standard_price', '>', 0),
                 ('product_id', '!=', False),
+                ('document_date', '!=', False),
                 ], context=context)
                 
             for history in self.browse(cr, uid, history_ids, context=context):
