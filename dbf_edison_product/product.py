@@ -172,9 +172,11 @@ class ProductProduct(orm.Model):
                 if product_ids:
                     # ---------------------------------------------------------
                     # Minimal update:
-                    data = {
-                        'lst_price': record['NPREZZO1'],
-                        }
+                    #data = {
+                    #    'lst_price': record['NPREZZO1'],
+                    #    }
+                    print default_code, record['NPREZZO1']
+                    
                     # ---------------------------------------------------------
                     try:
                         self.write(cr, uid, product_ids, data, context=context)
