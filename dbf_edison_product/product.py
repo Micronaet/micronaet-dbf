@@ -164,12 +164,18 @@ class ProductProduct(orm.Model):
                 if len(product_ids) > 1:
                     log(
                         log_file, 
-                        _('More than one product: %s (take last)') % default_code, 
+                        _('More product: %s, use one') % default_code, 
                         mode='ERROR',
                         )
                     product_ids = [product_ids[0]]
 
                 if product_ids:
+                    # ---------------------------------------------------------
+                    # Minimal update:
+                    data = {
+                        'lst_price': record['NPREZZO1'],
+                        }
+                    # ---------------------------------------------------------
                     try:
                         self.write(cr, uid, product_ids, data, context=context)
                     except:
