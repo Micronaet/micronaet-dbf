@@ -74,7 +74,6 @@ class ProductProduct(orm.Model):
         
         i = 0
         producer_db = {}
-        import pdb; pdb.set_trace()
         for record in company_pool.get_dbf_table(
                 cr, uid, db_name, context=context):
             i += 1
