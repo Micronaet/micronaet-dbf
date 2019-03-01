@@ -48,7 +48,7 @@ class ProductProduct(orm.Model):
     
     def schedule_dbf_edison_product_import(self, cr, uid, 
             verbose_log_count=100, log_name='product.log', mode='product',
-            context=None):
+            update=False, context=None):
         ''' Import product from external DBF
             mode: product (only product.product), mirror (only mirror), 
                   all (both)
@@ -155,38 +155,41 @@ class ProductProduct(orm.Model):
                 }
                 
             # Search product code:
-            product_ids = self.search(cr, uid, [
-                ('default_code', '=', default_code),
-                ('metel_producer_code', '=', metel_producer_code),
-                ], context=context)
-            if len(product_ids) > 1:
-                log(
-                    log_file, 
-                    _('More than one product: %s (take last)') % default_code, 
-                    mode='ERROR',
-                    )
-                product_ids = [product_ids[0]]
+            if update:
+                product_ids = self.search(cr, uid, [
+                    ('default_code', '=', default_code),
+                    ('metel_producer_code', '=', metel_producer_code),
+                    ], context=context)
+                if len(product_ids) > 1:
+                    log(
+                        log_file, 
+                        _('More than one product: %s (take last)') % default_code, 
+                        mode='ERROR',
+                        )
+                    product_ids = [product_ids[0]]
 
-            if product_ids:
-                try:
-                    self.write(cr, uid, product_ids, data, context=context)
-                except:
-                    del(data['ean13'])   
-                    log(
-                        log_file, _('Error EAN number: %s') % ean13, 
-                        mode='ERROR',
-                        )
-                    self.write(cr, uid, product_ids, data, context=context)
+                if product_ids:
+                    try:
+                        self.write(cr, uid, product_ids, data, context=context)
+                    except:
+                        del(data['ean13'])   
+                        log(
+                            log_file, _('Error EAN number: %s') % ean13, 
+                            mode='ERROR',
+                            )
+                        self.write(cr, uid, product_ids, data, context=context)
+                else:
+                    try:
+                        self.create(cr, uid, data, context=context)
+                    except:
+                        del(data['ean13'])    
+                        log(
+                            log_file, _('Error EAN number: %s') % ean13, 
+                            mode='ERROR',
+                            )
+                        self.create(cr, uid, data, context=context)
             else:
-                try:
-                    self.create(cr, uid, data, context=context)
-                except:
-                    del(data['ean13'])    
-                    log(
-                        log_file, _('Error EAN number: %s') % ean13, 
-                        mode='ERROR',
-                        )
-                    self.create(cr, uid, data, context=context)
+                print default_code, record['NPREZZO1'], record['NPREZZOP']
         log(
             log_file, 
             _('End import. Tot: %s\n') % i,
