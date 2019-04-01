@@ -2,7 +2,7 @@ from dbfread import DBF
 import os
 
 dbf_root_path = '.'
-table = 'ARTICO.dbf'
+table = 'ARTICO.dbf's
 filename = os.path.join(dbf_root_path, table)
 
 # Read parameter:    
