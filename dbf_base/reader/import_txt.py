@@ -50,6 +50,7 @@ odoo = erppeek.Client(
     )
 product_pool = odoo.model('product.product')
 
+not_found = []
 for root, folders, files in os.walk(path):
     for f in files:
         filename = os.path.join(root, f)
@@ -57,7 +58,6 @@ for root, folders, files in os.walk(path):
         if f[-3:].upper() == 'TXT':
              for row in open(filename):
                  print '>> ANALIZZO: ', row
-                 import pdb; pdb.set_trace()
                  if len(row) != col:
                      print '   Jumped', row
                      continue
@@ -70,6 +70,10 @@ for root, folders, files in os.walk(path):
                  lst_price = float(row[79:96].replace(' ', '')[1:])
 
                  print 'Used', row
+                 if not product_ids:
+                    not_found.append(default_code)
+
+                 import pdb; pdb.set_trace()
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
                      ])
@@ -77,3 +81,4 @@ for root, folders, files in os.walk(path):
                      'lst_price': lst_price,
                      })
     break
+print 'Non trovati', not_found
