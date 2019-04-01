@@ -50,7 +50,7 @@ odoo = erppeek.Client(
     )
 product_pool = odoo.model('product.product')
 
-product_ids = product_pool.search([
+"""product_ids = product_pool.search([
     ('standard_price', '=', 0),
     ('lst_price', '>', 0),
     '|',
@@ -66,7 +66,7 @@ for product in product_pool.browse(product_ids):
         'standard_price': product.lst_price,
         })
         
-sys.exit()    
+sys.exit()"""
 not_found = []
 for root, folders, files in os.walk(path):
     for f in files:
