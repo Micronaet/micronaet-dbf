@@ -63,6 +63,7 @@ for product in product_pool.browse(product_ids):
     product_pool.write(product.id, {
         'standard_price': product.lst_price,
         })
+    print 'Aggiorato: ', product.default_code, product.standard_price, product.lst_price,
         
 sys.exit()    
 not_found = []
