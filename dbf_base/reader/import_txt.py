@@ -54,6 +54,7 @@ import pdb; pdb.set_trace()
 for root, folders, files in os.path(path):
     for f in files:
         filename = os.path.join(root, f)
+        print 'Read:', filename
         if f[-3:].upper() == 'TXT':
              for row in open(filename):
                  line = row.split(' ') 
@@ -72,5 +73,5 @@ for root, folders, files in os.path(path):
                      ])
                  product_pool.write(product_ids, {
                      'lst_price': lst_price,
-                     }
+                     })
     break
