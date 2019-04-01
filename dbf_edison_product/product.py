@@ -85,10 +85,6 @@ class ProductProduct(orm.Model):
             default_code = record['CCODARTI']
             name = record['CDESARTI']
             ean13 = record['CCODARPR']            
-            if default_code == '3FF11346':
-                import pdb; pdb.set_trace()
-            else:
-                continue
 
             if verbose_log_count and i % verbose_log_count == 0:
                 _logger.info(_('Import product #: %s') % i)
