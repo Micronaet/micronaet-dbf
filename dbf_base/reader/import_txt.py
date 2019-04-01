@@ -71,12 +71,14 @@ for root, folders, files in os.walk(path):
 
                  print 'Used', row
                  import pdb; pdb.set_trace()
-                 if not product_ids:
-                    not_found.append(default_code)
 
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
                      ])
+
+                 if not product_ids:
+                    not_found.append(default_code)
+
                  product_pool.write(product_ids, {
                      'lst_price': lst_price,
                      })
