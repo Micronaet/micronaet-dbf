@@ -67,7 +67,7 @@ for root, folders, files in os.walk(path):
                      print '   Jumped', row
                      continue
 
-                 lst_price = float(row[79:96].replace(' ', '')[1:])
+                 lst_price = float(row[79:96].replace(' ', '').replace(',', '.')[1:])
 
                  print 'Used', row
                  if not product_ids:
