@@ -26,7 +26,7 @@ import ConfigParser
 # -----------------------------------------------------------------------------
 # Read configuration parameter:
 # -----------------------------------------------------------------------------
-col = 5 
+col = 107
 path = '/opt/odoo/.local/share/Odoo/mount/edison'
 cfg_file = os.path.expanduser('../openerp.cfg')
 
@@ -56,18 +56,19 @@ for root, folders, files in os.walk(path):
         print 'Read:', filename
         if f[-3:].upper() == 'TXT':
              for row in open(filename):
-                 line = row.split(' ') 
-                 print '>> ANALIZZO: ', line
+                 print '>> ANALIZZO: ', row
                  import pdb; pdb.set_trace()
                  if len(line) != col:
                      print '   Jumped', row
                      continue
-                 default_code = line[4] # XXX
-                 lst_price = line[5]
+                 default_code = row[60:79].strip()
                  
                  if default_code[2:3] != '-' and default_code[3:4] != '-':
                      print '   Jumped', row
                      continue
+
+                 lst_price = float(row[79:96].replace(' ', '').replace('x80', ''))
+
                  print 'Used', row
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
