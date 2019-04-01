@@ -74,14 +74,14 @@ for root, folders, files in os.walk(path):
         print 'Read:', filename
         if f[-3:].upper() == 'TXT':
              for row in open(filename):
-                 print '>> ANALIZZO: ', row
+                 #print '>> ANALIZZO: ', row
                  if len(row) != col:
-                     print '   Jumped', row
+                     print '[ERROR] Jumped not data line', row
                      continue
                  default_code = row[60:79].strip()
                  
                  if default_code[2:3] != '-' and default_code[3:4] != '-':
-                     print '   Jumped', row
+                     print '[ERROR] Jumped code not internal', row
                      continue
 
                  lst_price = float(
@@ -97,10 +97,10 @@ for root, folders, files in os.walk(path):
                     continue
 
                  if lst_price <= 0.0:
-                     print '    Jumped no price', row
+                     print '[WARNING] Jumped no price', row
                      continue
                      
-                 print 'Used', row
+                 print '[INFO] Used', row
                  product_pool.write(product_ids, {
                      'lst_price': lst_price,
                      })
