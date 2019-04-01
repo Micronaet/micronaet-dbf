@@ -87,16 +87,20 @@ for root, folders, files in os.walk(path):
                  lst_price = float(
                     row[79:96].replace(' ', '').replace(',', '.')[1:])
 
-                 print 'Used', row
                  import pdb; pdb.set_trace()
-
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
                      ])
 
                  if not product_ids:
                     not_found.append(default_code)
+                    continue
 
+                 if lst_price <= 0.0:
+                     print '    Jumped no price', row
+                     continue
+                     
+                 print 'Used', row
                  product_pool.write(product_ids, {
                      'lst_price': lst_price,
                      })
