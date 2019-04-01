@@ -58,7 +58,7 @@ for root, folders, files in os.walk(path):
              for row in open(filename):
                  print '>> ANALIZZO: ', row
                  import pdb; pdb.set_trace()
-                 if len(line) != col:
+                 if len(row) != col:
                      print '   Jumped', row
                      continue
                  default_code = row[60:79].strip()
