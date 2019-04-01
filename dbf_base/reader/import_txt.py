@@ -59,8 +59,9 @@ product_ids = product_pool.search([
     ])
 
 import pdb; pdb.set_trace()
+print 'Totale prodotti', len(product_ids)
 for product in product_pool.browse(product_ids):
-    print 'Aggiorno: ', product.default_code, product.standard_price, product.lst_price,
+    print 'Aggiorno: ', product.default_code, product.standard_price, product.lst_price
     product_pool.write(product.id, {
         'standard_price': product.lst_price,
         })
