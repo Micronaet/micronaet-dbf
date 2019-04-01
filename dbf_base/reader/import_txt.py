@@ -70,10 +70,10 @@ for root, folders, files in os.walk(path):
                  lst_price = float(row[79:96].replace(' ', '').replace(',', '.')[1:])
 
                  print 'Used', row
+                 import pdb; pdb.set_trace()
                  if not product_ids:
                     not_found.append(default_code)
 
-                 import pdb; pdb.set_trace()
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
                      ])
