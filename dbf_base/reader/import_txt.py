@@ -50,6 +50,21 @@ odoo = erppeek.Client(
     )
 product_pool = odoo.model('product.product')
 
+product_ids = product_pool.search([
+    ('standard_price', '=', 0),
+    ('lst_price', '>', 0),
+    '|',
+    ('default_code', '=ilike', '__-%'),
+    ('default_code', '=ilike', '___-%'),
+    ])
+
+import pdb; pdb.set_trace()
+for product in product_pool.browse(product_ids):
+    product_pool.write(product.id, {
+        'standard_price': product.lst_price,
+        })
+        
+sys.exit()    
 not_found = []
 for root, folders, files in os.walk(path):
     for f in files:
@@ -67,7 +82,8 @@ for root, folders, files in os.walk(path):
                      print '   Jumped', row
                      continue
 
-                 lst_price = float(row[79:96].replace(' ', '').replace(',', '.')[1:])
+                 lst_price = float(
+                    row[79:96].replace(' ', '').replace(',', '.')[1:])
 
                  print 'Used', row
                  import pdb; pdb.set_trace()
