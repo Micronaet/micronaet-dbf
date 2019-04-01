@@ -76,28 +76,28 @@ for root, folders, files in os.walk(path):
              for row in open(filename):
                  #print '>> ANALIZZO: ', row
                  if len(row) != col:
-                     print '[ERROR] Jumped not data line', row
+                     print '[WARNING] Jumped not data line', row
                      continue
                  default_code = row[60:79].strip()
                  
                  if default_code[2:3] != '-' and default_code[3:4] != '-':
-                     print '[ERROR] Jumped code not internal', row
+                     print '[WARNING] Jumped code not internal', row
                      continue
 
                  lst_price = float(
                     row[79:96].replace(' ', '').replace(',', '.')[1:])
 
-                 import pdb; pdb.set_trace()
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
                      ])
 
                  if not product_ids:
                     not_found.append(default_code)
+                    print '[ERROR] Not found', row
                     continue
 
                  if lst_price <= 0.0:
-                     print '[WARNING] Jumped no price', row
+                     print '[ERROR] Jumped no price', row
                      continue
                      
                  print '[INFO] Used', row
