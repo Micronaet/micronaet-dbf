@@ -1,4 +1,5 @@
 from dbfread import DBF
+import os
 
 dbf_root_path = '.'
 table = 'ARTICO.dbf'
