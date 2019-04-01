@@ -58,6 +58,7 @@ for root, folders, files in os.walk(path):
         if f[-3:].upper() == 'TXT':
              for row in open(filename):
                  line = row.split(' ') 
+                 print '>> ANALIZZO: ', line
                  if len(line) != col:
                      print '   Jumped', row
                      continue
