@@ -85,7 +85,7 @@ for root, folders, files in os.walk(path):
                      continue
 
                  lst_price = float(
-                    row[79:96].replace(' ', '').replace(',', '.')[1:])
+                    row[79:96].replace(' ', '').replace('.', '').replace(',', '.')[1:])
 
                  product_ids = product_pool.search([
                      ('default_code', '=', default_code),
