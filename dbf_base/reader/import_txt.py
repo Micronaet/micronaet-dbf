@@ -50,7 +50,6 @@ odoo = erppeek.Client(
     )
 product_pool = odoo.model('product.product')
 
-import pdb; pdb.set_trace()
 for root, folders, files in os.walk(path):
     for f in files:
         filename = os.path.join(root, f)
@@ -59,6 +58,7 @@ for root, folders, files in os.walk(path):
              for row in open(filename):
                  line = row.split(' ') 
                  print '>> ANALIZZO: ', line
+                 import pdb; pdb.set_trace()
                  if len(line) != col:
                      print '   Jumped', row
                      continue
