@@ -51,7 +51,7 @@ odoo = erppeek.Client(
 product_pool = odoo.model('product.product')
 
 import pdb; pdb.set_trace()
-for root, folders, files in os.path.walk(path):
+for root, folders, files in os.walk(path):
     for f in files:
         filename = os.path.join(root, f)
         print 'Read:', filename
